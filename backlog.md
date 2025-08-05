@@ -1,5 +1,5 @@
 |id|name|branch|assignee|status|
-------------------------------------
+|--|----|------|--------|------|
 |C1|SSDController/read개발|-|박성일|대기중|
 |C2|SSDController/write개발|-|최준식|대기중|
 |SH1A|ShellInterface/read개발|-|이휘은|대기중|
