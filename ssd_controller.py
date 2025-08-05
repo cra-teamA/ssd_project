@@ -6,7 +6,11 @@ class SSDController:
         # NAND파일 VAL 기입
         return True
 
-    def is_invalid_input(self, addr, val):
+    def _temp_read_for_test(self, addr: int):
+        temp_memory = {99: '0x100', 10: '0x10ff'}
+        return temp_memory.get(addr)
+
+    def is_invalid_input(self, addr: int, val: str) -> bool:
         if not isinstance(addr, int):
             return True
         if addr < 0 or addr > 99:
