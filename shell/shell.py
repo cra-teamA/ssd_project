@@ -26,5 +26,8 @@ class Shell:
 
     def write(self, lba:str):
         argument = lba.split()
+        if int(argument[1]) < 0 or int(argument[1]) > 99:
+            print("INVALID COMMAND")
+            return
         subprocess.run(["ssd", "W", argument[1], argument[2]])
         print("[Write] Done")
