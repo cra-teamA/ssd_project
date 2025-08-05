@@ -8,5 +8,5 @@ class FullWriteReadCompare(BaseScript):
 
     def run(self):
         self.shell.read(0)
-
+        self.shell.write(1,"0x00000000")
         pass
