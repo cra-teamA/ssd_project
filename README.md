@@ -1,9 +1,17 @@
-#SSD 프로젝트
----
-##SSD 검증용 Test Shell
+# SSD 프로젝트
+### 개요
 ```
- SSD 제품을 테스트 할수있는Test Shell 을 제작
+SSD 제품을 테스트 할수있는Test Shell 을 제작
 • 실제HW가아닌, SW로가상으로구현한다.
- • Test Shell 프로그램을 제작하여 SSD 동작을 테스트 할 수 있다.
- • 다양한Test Script를 제작한다.
+• Test Shell 프로그램을 제작하여 SSD 동작을 테스트 할 수 있다.
+• 다양한Test Script를 제작한다.
+```
+### 구성
+```
+1. SSD
+ • HW 대신, Software로 구현한다.
+2. Test Shell
+ • SSD를 테스트하는프로그램
+3. Test Script
+ • Test Shell 안에서 구현되는 SSD 테스트 코드
 ```
