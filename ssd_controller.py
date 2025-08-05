@@ -34,12 +34,7 @@ def main():
     if args.mode == "R":
         controller.read(args.address)
     elif args.mode == "W":
-        if args.value is None:
-            print("ERROR: Write 모드에서는 값이 필요합니다.")
-        elif not args.value.startswith("0x") or len(args.value) != 10:
-            print("ERROR: 값은 0x로 시작하고 총 10자리 HEX이어야 합니다.")
-        else:
-            controller.write(args.address, args.value)
+        controller.write(args.address, args.value)
 
 if __name__ == "__main__":
     main()
