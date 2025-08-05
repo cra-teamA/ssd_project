@@ -4,5 +4,6 @@ class SSDController:
             return False
         if addr < 0 or addr > 99:
             return False
-
+        if not isinstance(val, str):
+            return False
         return True
