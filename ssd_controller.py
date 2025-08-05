@@ -6,4 +6,9 @@ class SSDController:
             return False
         if not isinstance(val, str):
             return False
+        if not val.startswith('0x'):
+            return False
+        if any([char not in '0123456789abcdef' for char in val[2:]]):
+            return False
+
         return True
