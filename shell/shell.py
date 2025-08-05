@@ -23,3 +23,8 @@ class Shell:
     def get_lba_from_read_command(self, read_command: str) -> str:
         lba = read_command.split()[1]
         return lba
+
+    def write(self, lba:str):
+        argument = lba.split()
+        subprocess.run(["ssd", "W", argument[1], argument[2]])
+        print("[Write] Done")
