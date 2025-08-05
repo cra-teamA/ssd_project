@@ -1,8 +1,9 @@
 class SSDController:
     def write(self, addr: int, val: str) -> bool:
         if self.is_invalid_input(addr, val):
+            # OUTPUT 파일 ERROR 기입
             return False
-
+        # NAND파일 VAL 기입
         return True
 
     def is_invalid_input(self, addr, val):
