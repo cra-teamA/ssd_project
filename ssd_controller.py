@@ -1,14 +1,16 @@
-import os
+import json
+SSD_NAND_PATH = 'ssd_nand.txt'
+SSD_OUT_PATH = 'ssd_output.txt'
 class SSDController:
-    def read(self,addr):
-        filepath = 'ssd_nand.txt'
-        if not os.path.exists(filepath):
-            with open(filepath,'w') as f:
-                f.write('{}')
+    def __init__(self):
+        ...
+    def read(self,addr:int):
 
-        with open(filepath, 'r') as f:  # 읽기
-            dic = eval(f.read())
-            return dic.get(addr,0)
+        with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f).get(str(addr))
+        print(data)
+        with open(SSD_OUT_PATH, "w", encoding="utf-8") as f:
+            f.write(data)
 
     def write(self,addr, value):
         pass
