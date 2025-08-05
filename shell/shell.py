@@ -12,7 +12,7 @@ class Shell:
     def read(self, read_command):
         lba = self.get_lba_from_read_command(read_command)
         subprocess.run(
-            [ "ssd", "R", lba],
+            ["ssd", "R", lba],
             capture_output=True,
             text=True
         )
@@ -29,16 +29,13 @@ class Shell:
         return lba
 
     def write(self, lba: str):
-        cmd, address, data = lba.split()
-        if int(address) < MIN_ADDRESS or int(address) > MAX_ADDRESS:
-            print("INVALID COMMAND")
-            return
-        if len(data) > MAX_DATA_LENGTH or not data.upper().startswith("0X"):
-            print("INVALID COMMAND")
-            return
+        _, address, data = lba.split()
         try:
-            data_num = int(data, 16)
-            data = f"0x{data_num:08X}"
+            if int(address) < MIN_ADDRESS or int(address) > MAX_ADDRESS:
+                raise ValueError
+            if len(data) > MAX_DATA_LENGTH or not data.upper().startswith("0X"):
+                raise ValueError
+            data = f"0x{int(data, 16) :08X}"
             subprocess.run(["ssd", "W", address, data])
             print("[Write] Done")
         except ValueError:
