@@ -1,4 +1,4 @@
-# SSD 프로젝트
+# SSD 프로젝트 by Team AllClear
 ### 개요
 ```
 SSD 제품을 테스트 할수있는Test Shell 을 제작
@@ -15,3 +15,5 @@ SSD 제품을 테스트 할수있는Test Shell 을 제작
 3. Test Script
  • Test Shell 안에서 구현되는 SSD 테스트 코드
 ```
+### 역할 분담
+[백로그 문서](backlog.md)
