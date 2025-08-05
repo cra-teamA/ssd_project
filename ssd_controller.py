@@ -1,14 +1,30 @@
+import json, os
+
+SSD_NAND_PATH = 'ssd_nand.txt'
+
+
 class SSDController:
     def write(self, addr: int, val: str) -> bool:
         if self.is_invalid_input(addr, val):
             # OUTPUT 파일 ERROR 기입
             return False
-        # NAND파일 VAL 기입
+        if not os.path.exists(SSD_NAND_PATH):
+            with open(SSD_NAND_PATH, 'w') as f:
+                json.dump({}, f)
+
+        with open(SSD_NAND_PATH, "r") as f:
+            memory = json.load(f)
+            memory[str(addr)] = val.lower()
+
+        with open(SSD_NAND_PATH, "w") as f:
+            json.dump(memory, f)
+            
         return True
 
     def _temp_read_for_test(self, addr: int):
-        temp_memory = {99: '0x100', 10: '0x10ff'}
-        return temp_memory.get(addr)
+        with open(SSD_NAND_PATH, "r") as f:
+            memory = json.load(f)
+        return memory.get(str(addr))
 
     def is_invalid_input(self, addr: int, val: str) -> bool:
         if not isinstance(addr, int):
