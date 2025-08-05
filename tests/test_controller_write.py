@@ -7,7 +7,7 @@ def test_create_ssd_controller_instance():
     assert isinstance(ssd, SSDController)
 
 
-def test_write_addr():
+def test_write_valid_addr():
     ssd = SSDController()
     assert ssd.write(0, '0x100') == True
 
