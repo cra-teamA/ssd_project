@@ -1,5 +1,8 @@
 import subprocess
 
+MIN_ADDRESS = 0
+MAX_ADDRESS = 99
+MAX_DATA_LENGTH = 10
 
 class Shell:
     def __init__(self):
@@ -25,12 +28,13 @@ class Shell:
         return lba
 
     def write(self, lba:str):
-        argument = lba.split()
-        if int(argument[1]) < 0 or int(argument[1]) > 99:
+        cmd, address, data = lba.split()
+        if int(address) < MIN_ADDRESS or int(address) > MAX_ADDRESS:
             print("INVALID COMMAND")
             return
-        if len(argument[2]) > 10:
+        if len(data) > MAX_DATA_LENGTH:
             print("INVALID COMMAND")
             return
-        subprocess.run(["ssd", "W", argument[1], argument[2]])
+        subprocess.run(["ssd", "W", address, data])
         print("[Write] Done")
+
