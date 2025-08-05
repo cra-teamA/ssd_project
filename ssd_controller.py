@@ -1,3 +1,3 @@
 class SSDController:
-    def write(self, addr, val):
+    def write(self, addr: int, val: str) -> bool:
         return True
