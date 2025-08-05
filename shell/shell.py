@@ -21,7 +21,7 @@ class Shell:
             print(f"[Read] LBA {lba} : {line}")
 
     def help(self):
-        message = '''
+        print('''
         제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은
         명령어 사용 법 :
          1. read: read [LBA]
@@ -33,7 +33,7 @@ class Shell:
          7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력
          8. exit: exit
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
-        print(message)
+        )
 
     def get_lba_from_read_command(self, read_command: str) -> str:
         lba = read_command.split()[1]
