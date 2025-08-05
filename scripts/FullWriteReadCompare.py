@@ -1,7 +1,7 @@
 from scripts.BaseScript import BaseScript
 from shell.shell import Shell
 
-class Script1_FullWrite(BaseScript):
+class FullWriteReadCompare(BaseScript):
     def __init__(self, shell_interface:Shell):
         self.shell = shell_interface
 
