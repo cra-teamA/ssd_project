@@ -1,2 +1,3 @@
 class SSDController:
-    pass
+    def write(self, addr, val):
+        return True
