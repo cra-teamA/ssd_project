@@ -36,3 +36,16 @@ def test_write_right_written(addr, val):
     ssd = SSDController()
     ssd.write(addr, val)
     assert ssd._temp_read_for_test(addr) == val
+
+
+@pytest.mark.parametrize("addr, val", [(99, '0x100'), (10, '0x10ff')])
+def test_write_right_written(addr, val):
+    ssd = SSDController()
+    ssd.write(addr, val)
+    assert ssd._temp_read_for_test(addr) == val
+
+def test_write_check_output_file_when_invalid_input():
+    ssd = SSDController()
+    ssd.write(-1, -1)
+    ssd.check_output_msg()
+    assert ssd.check_output_msg() == 'ERROR'

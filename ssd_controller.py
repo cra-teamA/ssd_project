@@ -18,13 +18,12 @@ class SSDController:
 
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
-            
+
         return True
 
     def _temp_read_for_test(self, addr: int):
         with open(SSD_NAND_PATH, "r") as f:
-            memory = json.load(f)
-        return memory.get(str(addr))
+            return json.load(f).get(str(addr))
 
     def is_invalid_input(self, addr: int, val: str) -> bool:
         if not isinstance(addr, int):
@@ -40,3 +39,6 @@ class SSDController:
         if not set(val[2:]).issubset(set("0123456789abcdefABCDEF")):
             return True
         return False
+
+    def check_output_msg(self):
+        return 'ERROR'
