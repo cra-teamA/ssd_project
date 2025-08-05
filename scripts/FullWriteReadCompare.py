@@ -1,3 +1,5 @@
+import random
+
 from scripts.BaseScript import BaseScript
 from shell.shell import Shell
 
@@ -7,8 +9,18 @@ class FullWriteReadCompare(BaseScript):
 
 
     def run(self):
-        for i in range(100):
-            self.shell.write(f"W {i} 0x00000000")
 
-        command = "R 0"
-        self.shell.read(command)
+
+        for group in range(20):
+            value = f"0x{random.getrandbits(32):08x}"
+
+            start_lba = group * 5
+            end_lba = start_lba + 5
+
+            for lba in range(start_lba, end_lba):
+                self.shell.write(f"W {lba} {value}")
+
+            for lba in range(start_lba, end_lba):
+                result = self.shell.read(f"R {lba} {value}")
+
+
