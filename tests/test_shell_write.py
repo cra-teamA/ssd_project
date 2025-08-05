@@ -4,6 +4,7 @@ from shell.shell import Shell
 
 INVALID_MSG = "INVALID COMMAND\n"
 
+
 @pytest.fixture
 def shell_and_subprocess_mocker(mocker):
     shell = Shell()
@@ -28,10 +29,21 @@ def test_shell_write_valid_check_address(capsys, shell_and_subprocess_mocker):
     assert captured.out == INVALID_MSG
     assert mock_run.call_count == 0
 
+
 def test_shell_write_valid_check_data(capsys, shell_and_subprocess_mocker):
     shell, mock_run = shell_and_subprocess_mocker
-    shell.write("write 3 0xAAAAABBBB")
 
+    shell.write("write 3 0xAAAAABBBB")
+    captured = capsys.readouterr()
+    assert captured.out == INVALID_MSG
+    assert mock_run.call_count == 0
+
+    shell.write("write 3 0xAAAAFFFK")
+    captured = capsys.readouterr()
+    assert captured.out == INVALID_MSG
+    assert mock_run.call_count == 0
+
+    shell.write("write 3 AAAAFFF")
     captured = capsys.readouterr()
     assert captured.out == INVALID_MSG
     assert mock_run.call_count == 0
@@ -40,5 +52,3 @@ def test_shell_write_valid_check_data(capsys, shell_and_subprocess_mocker):
     captured = capsys.readouterr()
     assert captured.out == "[Write] Done\n"
     mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
-
-
