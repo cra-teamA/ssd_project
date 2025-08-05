@@ -35,6 +35,9 @@ class Shell:
         if len(data) > MAX_DATA_LENGTH:
             print("INVALID COMMAND")
             return
+        if len(data) < MAX_DATA_LENGTH:
+            data_num = int(data, 16)
+            data = f"0x{data_num:08X}"
         subprocess.run(["ssd", "W", address, data])
         print("[Write] Done")
 
