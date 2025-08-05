@@ -1,4 +1,6 @@
 import json
+
+ERROR = 'ERROR'
 SSD_NAND_PATH = 'ssd_nand.txt'
 SSD_OUTPUT_PATH = 'ssd_output.txt'
 class SSDController:
@@ -6,7 +8,7 @@ class SSDController:
         ...
     def read(self,addr:int):
         if addr < 0 or addr > 99:
-            self.output('ERROR')
+            self.output(ERROR)
             return
         with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
             data = json.load(f).get(str(addr))
