@@ -10,3 +10,14 @@ def test_shell_write(capsys, mocker):
     captured = capsys.readouterr()
     assert captured.out == "[Write] Done\n"
     mock_run.assert_called_once_with(["ssd", "W", "3", "0xAAAABBBB"])
+
+
+def test_shell_write_valid_check_address(capsys, mocker):
+    shell = Shell()
+    mock_run = mocker.patch("shell.shell.subprocess.run")
+    shell.write("write 1000 0xAAAABBBB")
+    
+    captured = capsys.readouterr()
+    assert captured.out == "INVALID COMMAND\n"
+    assert mock_run.call_count == 0
+
