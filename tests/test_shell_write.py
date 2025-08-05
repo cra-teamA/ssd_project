@@ -21,7 +21,7 @@ def test_shell_write(capsys, shell_and_subprocess_mocker):
     mock_run.assert_called_once_with(["ssd", "W", "3", "0xAAAABBBB"])
 
 
-def test_shell_write_valid_check_address(capsys, shell_and_subprocess_mocker):
+def test_shell_write_valid_check_lba(capsys, shell_and_subprocess_mocker):
     shell, mock_run = shell_and_subprocess_mocker
     shell.write("write 1000 0xAAAABBBB")
 
@@ -30,7 +30,7 @@ def test_shell_write_valid_check_address(capsys, shell_and_subprocess_mocker):
     assert mock_run.call_count == 0
 
 
-def test_shell_write_valid_check_data(capsys, shell_and_subprocess_mocker):
+def test_shell_write_valid_check_value(capsys, shell_and_subprocess_mocker):
     shell, mock_run = shell_and_subprocess_mocker
 
     shell.write("write 3 0xAAAAABBBB")

@@ -1,8 +1,8 @@
 import subprocess
 
-MIN_ADDRESS = 0
-MAX_ADDRESS = 99
-MAX_DATA_LENGTH = 10
+MIN_LBA = 0
+MAX_LBA = 99
+MAX_VALUE_LENGTH = 10
 
 
 class Shell:
@@ -28,15 +28,14 @@ class Shell:
         lba = read_command.split()[1]
         return lba
 
-    def write(self, lba: str):
-        _, address, data = lba.split()
+    def write(self, read_command: str):
+        _, lba, value = read_command.split()
         try:
-            if int(address) < MIN_ADDRESS or int(address) > MAX_ADDRESS:
+            if int(lba) < MIN_LBA or int(lba) > MAX_LBA:
                 raise ValueError
-            if len(data) > MAX_DATA_LENGTH or not data.upper().startswith("0X"):
+            if len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X"):
                 raise ValueError
-            data = f"0x{int(data, 16) :08X}"
-            subprocess.run(["ssd", "W", address, data])
+            subprocess.run(["ssd", "W", lba, f"0x{int(value, 16) :08X}"])
             print("[Write] Done")
         except ValueError:
             print("INVALID COMMAND")
