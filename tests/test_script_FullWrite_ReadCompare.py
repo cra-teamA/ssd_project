@@ -19,9 +19,9 @@ def test_script_read_0(mock_shell_interface):
     script = FullWriteReadCompare(mock_shell_interface)
     script.run()
 
-    mock_shell_interface.read.assert_called_once_with(0)
+    mock_shell_interface.read.assert_called_once_with("R 0")
 
 def test_script_write_0_0x00000000(mock_shell_interface):
     script = FullWriteReadCompare(mock_shell_interface)
     script.run()
-    mock_shell_interface.write.assert_called_once_with(1,"0x00000000")
+    mock_shell_interface.write.assert_called_once_with("W 1 0x00000000")
