@@ -36,3 +36,9 @@ def test_shell_write_valid_check_data(capsys, shell_and_subprocess_mocker):
     assert captured.out == INVALID_MSG
     assert mock_run.call_count == 0
 
+    shell.write("write 3 0xBBBB")
+    captured = capsys.readouterr()
+    assert captured.out == "[Write] Done\n"
+    mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
+
+
