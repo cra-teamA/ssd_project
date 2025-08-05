@@ -1,4 +1,6 @@
 import pytest
+from conda.common.io import captured
+
 from shell.shell import Shell
 
 
@@ -25,3 +27,12 @@ def test_shell_write_valid_check_address(capsys, shell_and_subprocess_mocker):
     captured = capsys.readouterr()
     assert captured.out == "INVALID COMMAND\n"
     assert mock_run.call_count == 0
+
+def test_shell_write_valid_check_data(capsys, shell_and_subprocess_mocker):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.write("write 3 0xAAAAABBBB")
+
+    captured = capsys.readouterr()
+    assert captured.out == "INVALID COMMAND\n"
+    assert mock_run.call_count == 0
+
