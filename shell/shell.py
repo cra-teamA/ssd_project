@@ -33,10 +33,14 @@ class Shell:
         if int(address) < MIN_ADDRESS or int(address) > MAX_ADDRESS:
             print("INVALID COMMAND")
             return
-        if len(data) > MAX_DATA_LENGTH:
+        if len(data) > MAX_DATA_LENGTH or not data.upper().startswith("0X"):
             print("INVALID COMMAND")
             return
-        data_num = int(data, 16)
-        data = f"0x{data_num:08X}"
-        subprocess.run(["ssd", "W", address, data])
-        print("[Write] Done")
+        try:
+            data_num = int(data, 16)
+            data = f"0x{data_num:08X}"
+            subprocess.run(["ssd", "W", address, data])
+            print("[Write] Done")
+        except ValueError:
+            print("INVALID COMMAND")
+            return
