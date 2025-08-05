@@ -8,10 +8,8 @@ class SSDController:
             return False
         if len(val) > 10:
             return False
-        val = val.lower()
-        if not val.startswith('0x'):
+        if not (val.startswith('0x') or val.startswith('0X') ):
             return False
         if not set(val[2:]).issubset(set("0123456789abcdef")):
             return False
-
         return True
