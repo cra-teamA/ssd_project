@@ -19,7 +19,7 @@ SSD 제품을 테스트 할수있는Test Shell 을 제작
 <img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/7bac7b22-56cd-402e-a3f5-5ef6d7325e10" />
 
 ### 역할 분담
-팀장: 장진섭</br>
-팀원: 이규홍, 임소현, 최준식, 이휘은, 박성일
+- 팀장: 장진섭</br>
+- 팀원: 이규홍, 임소현, 최준식, 이휘은, 박성일
 
 ### [백로그 문서](backlog.md)
