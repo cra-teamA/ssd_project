@@ -18,7 +18,8 @@ def test_write_invalid_addr(invalid_addr):
     assert ssd.write(invalid_addr, '0x100') == False
 
 
-@pytest.mark.parametrize("invalid_val", [100, -1, '100', None, '0X123', 'aa1', '0xkk'])
+@pytest.mark.parametrize("invalid_val", [100, -1, '100', None, '00', 'aa1', '0xkk',
+                                         '0x11111111111111111'])
 def test_write_invalid_val(invalid_val):
     ssd = SSDController()
     assert ssd.write(0, invalid_val) == False
