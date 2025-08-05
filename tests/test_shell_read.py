@@ -15,7 +15,7 @@ def test_shell_read_valid_index(mocker: MockerFixture, capsys):
     captured = capsys.readouterr()
 
     mock_subprocess.assert_called_once_with(
-        ["python", "ssd.py", "R", "3"],
+        ["ssd", "R", "3"],
         capture_output=True,
         text=True
     )
