@@ -24,13 +24,11 @@ def test_script_read_0(mock_shell_interface):
 def test_script_write_0_0x00000000(mock_shell_interface):
     script = FullWriteReadCompare(mock_shell_interface)
     script.run()
-    mock_shell_interface.write.assert_called_once_with("W 1 0x00000000")
+    mock_shell_interface.write.assert_any_call("W 1 0x00000000")
 
 def test_script_write_all(mock_shell_interface):
      script = FullWriteReadCompare(mock_shell_interface)
      script.run()
-     mock_shell_interface.write.assert_any_call("W 1 0x00000000")
-     mock_shell_interface.write.assert_any_call("W 11 0x00000000")
-     mock_shell_interface.write.assert_any_call("W 31 0x00000000")
-     mock_shell_interface.write.assert_any_call("W 55 0x00000000")
-     mock_shell_interface.write.assert_any_call("W 99 0x00000000")
+
+     for i, call_args in enumerate(mock_shell_interface.write.call_args_list):
+         assert call_args.args[0] == f"W {i} 0x00000000"
