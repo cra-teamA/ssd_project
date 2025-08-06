@@ -57,9 +57,9 @@ class Shell:
     def write(self, read_command: str):
         _, lba, value = read_command.split()
         try:
-            if int(lba) < MIN_LBA or int(lba) > MAX_LBA:
+            if self._is_invalid_lba(lba):
                 raise ValueError
-            if len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X"):
+            if self._is_invalid_value(value):
                 raise ValueError
             subprocess.run(["ssd", "W", lba, f"0x{int(value, 16) :08X}"])
             print("[Write] Done")
@@ -70,11 +70,17 @@ class Shell:
     def fullwrite(self, read_command: str):
         _, value = read_command.split()
         try:
-            if len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X"):
+            if self._is_invalid_value(value):
                 raise ValueError
-            for lba in range(MIN_LBA,MAX_LBA+1):
+            for lba in range(MIN_LBA, MAX_LBA + 1):
                 subprocess.run(["ssd", "W", str(lba), f"0x{int(value, 16) :08X}"])
             print("[FullWrite] Done")
         except ValueError:
             print("INVALID COMMAND")
             return
+
+    def _is_invalid_lba(self, lba):
+        return int(lba) < MIN_LBA or int(lba) > MAX_LBA
+
+    def _is_invalid_value(self, value):
+        return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
