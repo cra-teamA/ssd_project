@@ -1,31 +1,71 @@
 import pytest
-from scripts.BaseScript import BaseScript
+from unittest.mock import Mock
+from scripts.FullWriteReadCompare import FullWriteReadCompare
 from shell.shell import Shell
 
-class DummyScript(BaseScript):
-    def run(self):
-        pass  # run 추상 메서드 구현
+@pytest.fixture
+def mock_dummy_shell_interface():
+    mock = Mock(spec=Shell)
+    return mock
 
-def test_base_script_can_be_instantiated(mocker):
-    mock_shell = mocker.Mock(spec=Shell)
-    instance = DummyScript(mock_shell)
-    assert isinstance(instance, BaseScript)
+@pytest.fixture
+def mock_normal_shell_interface():
+    mock = Mock()
+    # side_effect: 각 LBA별로 "read {lba}"가 들어오면 group 값 반환
+    def read_side_effect(cmd):
+        # cmd: "read {lba}"
+        lba = int(cmd.split()[1])
+        group = lba // 5
+        return f"0x{group:08x}"
+    mock.read.side_effect = read_side_effect
+    return mock
 
-def test_write_lba_calls_shell_write(mocker):
-    mock_shell = mocker.Mock(spec=Shell)
-    script = DummyScript(mock_shell)
+@pytest.fixture
+def mock_compare_fail_shell_interface():
+    mock = Mock()
+    # 0~12: 정상값, 13번째 read (LBA 12)에서만 불일치 값 반환
+    def read_side_effect(cmd):
+        lba = int(cmd.split()[1])
+        if lba == 12:
+            return "0x00000007"  # 불일치 값
+        group = lba // 5
+        return f"0x{group:08x}"
+    mock.read.side_effect = read_side_effect
+    return mock
 
-    script.write_lba("3", "0xABCDEF12")
+def test_script_init(mock_dummy_shell_interface):
+    script = FullWriteReadCompare(mock_dummy_shell_interface)
+    assert script is not None
+    assert script.shell is mock_dummy_shell_interface
 
-    mock_shell.write.assert_called_once_with("write 3 0xABCDEF12",True)
+def test_script_read_0(mock_dummy_shell_interface):
+    script = FullWriteReadCompare(mock_dummy_shell_interface)
+    script.run()
+    mock_dummy_shell_interface.read.assert_any_call("read 0")
 
+def test_script_write_0_0x00000000(mock_dummy_shell_interface):
+    script = FullWriteReadCompare(mock_dummy_shell_interface)
+    script.run()
+    mock_dummy_shell_interface.write.assert_any_call("write 1 0x00000000")
 
-def test_read_lba_calls_shell_read_and_returns_value(mocker):
-    mock_shell = mocker.Mock(spec=Shell)
-    mock_shell.read.return_value = "0x12345678"
-    script = DummyScript(mock_shell)
+def test_script_run_pass(mock_normal_shell_interface):
+    script = FullWriteReadCompare(mock_normal_shell_interface)
+    result = script.run()
+    assert result is True
+    assert mock_normal_shell_interface.write.call_count == 100
+    assert mock_normal_shell_interface.read.call_count == 100
 
-    result = script.read_lba("3")
+    for i, (w_call, r_call) in enumerate(zip(mock_normal_shell_interface.write.call_args_list, mock_normal_shell_interface.read.call_args_list)):
+        group = i // 5
+        expected_value = f"0x{group:08x}"
+        expected_write = f"write {i} {expected_value}"
+        expected_read = f"read {i}"
+        assert w_call.args[0] == expected_write
+        assert r_call.args[0] == expected_read
 
-    mock_shell.read.assert_called_once_with('read 3', True)
-    assert result == "0x12345678"
+def test_script_run_fail(mock_compare_fail_shell_interface):
+    script = FullWriteReadCompare(mock_compare_fail_shell_interface)
+    result = script.run()
+    assert result is False
+    assert mock_compare_fail_shell_interface.write.call_count == 15
+    assert mock_compare_fail_shell_interface.read.call_count == 13
