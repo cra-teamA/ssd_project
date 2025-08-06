@@ -13,7 +13,9 @@ DEFAULT_VALUE = '0x00000000'
 class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
-
+    def ssd_nand_init(self):
+        with open(SSD_NAND_PATH, 'w') as f:
+            json.dump({}, f)
     def read(self, addr: int) -> None:
         try:
             if self.validator.is_lba_bad(addr):
@@ -24,7 +26,10 @@ class SSDController:
                 self.output(data)
         except FileNotFoundError:
             self.output(DEFAULT_VALUE)
-        except:
+        except json.decoder.JSONDecodeError:
+            self.output(DEFAULT_VALUE)
+        except Exception as e:
+            print(e.__class__)
             self.output(ERROR)
 
     def write(self, addr: int, val: str) -> bool:
@@ -41,11 +46,13 @@ class SSDController:
 
     def update_nand_txt(self, addr, val) -> None:
         if not os.path.exists(SSD_NAND_PATH):
-            with open(SSD_NAND_PATH, 'w') as f:
-                json.dump({}, f)
-        with open(SSD_NAND_PATH, "r") as f:
-            memory = json.load(f)
-            memory[str(addr)] = val.lower()
+            self.ssd_nand_init()
+        try:
+            with open(SSD_NAND_PATH, "r") as f:
+                memory = json.load(f)
+                memory[str(addr)] = val.lower()
+        except json.decoder.JSONDecodeError:
+            self.ssd_nand_init()
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
 
