@@ -17,6 +17,10 @@ def shell_with_single_data():
         json.dump(SINGLE_TEST_DATA, f, ensure_ascii=False)
     return shell
 
+def get_ssd_output():
+    with open(SSD_OUTPUT_PATH, "r", encoding="utf-8") as f:
+        actual = f.read()
+    return actual
 def test_shell_read_cmd_success(capsys, shell_with_single_data):
     shell = shell_with_single_data
     shell.read(f"read 1")
@@ -60,3 +64,35 @@ def test_shell_write_script_success(capsys, shell_with_single_data, addr, value)
     captured = capsys.readouterr()
     value = f"0x{int(value, 16) :08X}".lower()
     assert captured.out == f"[Read] LBA {addr} : {value}\n"
+
+@pytest.mark.parametrize("addr, value", [(-1,"0x0000BBBB"), (100,"0xBBBB")])
+def test_shell_write_cmd_invalid_address(shell_with_single_data, addr, value):
+    shell = shell_with_single_data
+    with pytest.raises(ValueError):
+        shell.write(f"write {addr} {value}", True)
+    # assert get_ssd_output() == ERROR
+
+@pytest.mark.parametrize("addr, value", [(0,"0xZ"), (1,"0x000000000")])
+def test_shell_write_cmd_invalid_value(shell_with_single_data, addr, value):
+    shell = shell_with_single_data
+    with pytest.raises(ValueError):
+        shell.write(f"write {addr} {value}", True)
+    # assert get_ssd_output() == ERROR
+
+@pytest.mark.parametrize("addr, value", [(0,"0xZ"), (1,"0x000000000")])
+def test_shell_write_cmd_invalid_value(shell_with_single_data, addr, value):
+    shell = shell_with_single_data
+    with pytest.raises(ValueError):
+        shell.write(f"write {addr} {value}", True)
+    # assert get_ssd_output() == ERROR
+
+def test_shell_full_write(capsys, shell_with_single_data):
+    shell = Shell()
+    value = '0x0000BBBB'.lower()
+    shell.fullwrite(f"write {value}")
+    captured = capsys.readouterr()
+    assert captured.out == "[FullWrite] Done\n"
+
+    shell.fullread()
+    captured = capsys.readouterr()
+    assert captured.out.strip() == '[Full Read]\n' + '\n'.join([f"LBA {i:02d} : {value}" for i in range(100)])
