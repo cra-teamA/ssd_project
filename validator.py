@@ -6,23 +6,23 @@ class Validator(ABC):
     ADDR_MAX = 99
 
     @abstractmethod
-    def check_lba(self, lba) -> bool:
+    def is_lba_bad(self, lba) -> bool:
         pass
 
     @abstractmethod
-    def check_value(self, val) -> bool:
+    def is_value_bad(self, val) -> bool:
         pass
 
 
 class ControllerValidator(Validator):
-    def check_lba(self, lba) -> bool:
+    def is_lba_bad(self, lba) -> bool:
         if not isinstance(lba, int):
             return True
         if lba < self.ADDR_MIN or lba > self.ADDR_MAX:
             return True
         return False
 
-    def check_value(self, val) -> bool:
+    def is_value_bad(self, val) -> bool:
         if not isinstance(val, str):
             return True
         if len(val) != 10:

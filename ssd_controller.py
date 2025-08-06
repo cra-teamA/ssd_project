@@ -24,7 +24,7 @@ class SSDController:
             self.output(ERROR)
 
     def write(self, addr: int, val: str) -> bool:
-        if self.is_invalid_input(addr, val):
+        if self.validator.is_lba_bad(addr) or self.validator.is_value_bad(val):
             self.output(ERROR)
             return False
 
@@ -45,12 +45,6 @@ class SSDController:
         with open(SSD_NAND_PATH, "r") as f:
             return json.load(f).get(str(addr))
 
-    def is_invalid_input(self, addr: int, val: str) -> bool:
-        if self.validator.check_lba(addr):
-            return True
-        if self.validator.check_value(val):
-            return True
-        return False
 
     def check_output_msg(self):
         with open(SSD_OUTPUT_PATH, 'r') as f:
