@@ -9,7 +9,7 @@ def test_create_ssd_controller_instance():
 
 def test_write_valid_addr():
     ssd = SSDController()
-    assert ssd.write(0, '0x100') == True
+    assert ssd.write(0, '0x10000000') == True
 
 
 @pytest.mark.parametrize("invalid_addr", [100, -1, '100', None])
@@ -18,7 +18,7 @@ def test_write_invalid_addr(invalid_addr):
     assert ssd.write(invalid_addr, '0x100') == False
 
 
-@pytest.mark.parametrize("valid_val", ['0x001', '0X001', '0xff', '0xFf'])
+@pytest.mark.parametrize("valid_val", ['0x0fffff01', '0X00000000', '0xf000000f', '0xFfFAFAAA'])
 def test_write_valid_val(valid_val):
     ssd = SSDController()
     assert ssd.write(0, valid_val) == True
