@@ -12,29 +12,20 @@ def test_base_script_can_be_instantiated(mocker):
     assert isinstance(instance, BaseScript)
 
 def test_write_lba_calls_shell_write(mocker):
-    data = 0xAB
-    lba = 0x10
-
-    mock_shell = mocker.Mock()
-    mock_shell.read.return_value = data
+    mock_shell = mocker.Mock(spec=Shell)
     script = DummyScript(mock_shell)
 
-    script.write_lba(lba, data)
-    result = script.read_lba(lba)
+    script.write_lba("3", "0xABCDEF12")
 
-    # then
-    assert result == data
-    mock_shell.write.assert_called_once_with(lba, data)
-    mock_shell.write.assert_called_once_with(lba, data)
-    mock_shell.read.assert_called_once_with(lba)
+    mock_shell.write.assert_called_once_with("write 3 0xABCDEF12")
+
 
 def test_read_lba_calls_shell_read_and_returns_value(mocker):
     mock_shell = mocker.Mock(spec=Shell)
-    mock_shell.read.return_value = 0xCD
-
+    mock_shell.read.return_value = "0x12345678"
     script = DummyScript(mock_shell)
 
-    result = script.read_lba(0x20)
+    result = script.read_lba("3")
 
-    mock_shell.read.assert_called_once_with(0x20)
-    assert result == 0xCD
+    mock_shell.read.assert_called_once_with("3")
+    assert result == "0x12345678"
