@@ -15,10 +15,12 @@ class ScriptRunner:
 
     def run(self, command: str) -> bool | None:
 
-        parts = command.split("_", 1)
-        idx_part = parts[0]
+        if not (parts := command.split("_", 1)) or len(parts) != 2:
+            return None
 
-        script_class = self.script_mapping.get(idx_part)
+        script_class = self.script_mapping.get(parts[0])
+        if not script_class:
+            return None
 
         script = script_class(self.shell)
 
