@@ -28,7 +28,6 @@ class SSDController:
 
     def write(self, addr: int, val: str) -> bool:
         try:
-
             if self.validator.is_lba_bad(addr) or self.validator.is_value_bad(val):
                 self.output(ERROR)
                 return False
@@ -37,6 +36,8 @@ class SSDController:
             return True
         except:
             self.output(ERROR)
+            return False
+
     def update_nand_txt(self, addr, val):
         if not os.path.exists(SSD_NAND_PATH):
             with open(SSD_NAND_PATH, 'w') as f:
@@ -46,10 +47,6 @@ class SSDController:
             memory[str(addr)] = val.lower()
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
-
-    def _temp_read_for_test(self, addr: int):
-        with open(SSD_NAND_PATH, "r") as f:
-            return json.load(f).get(str(addr))
 
     def check_output_msg(self):
         with open(SSD_OUTPUT_PATH, 'r') as f:
