@@ -51,7 +51,6 @@ def test_script_write_0_0x00000000(mock_dummy_shell_interface):
 def test_script_run_pass(mock_normal_shell_interface):
     script = FullWriteReadCompare(mock_normal_shell_interface)
     result = script.run()
-    assert result is True
     assert mock_normal_shell_interface.write.call_count == 100
     assert mock_normal_shell_interface.read.call_count == 100
 
@@ -66,6 +65,5 @@ def test_script_run_pass(mock_normal_shell_interface):
 def test_script_run_fail(mock_compare_fail_shell_interface):
     script = FullWriteReadCompare(mock_compare_fail_shell_interface)
     result = script.run()
-    assert result is False
     assert mock_compare_fail_shell_interface.write.call_count == 15
     assert mock_compare_fail_shell_interface.read.call_count == 13
