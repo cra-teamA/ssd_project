@@ -1,6 +1,6 @@
 import pytest
 
-from ssd_controller import SSDController
+from core.ssd_controller import SSDController
 import json
 import os
 

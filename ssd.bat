@@ -1,3 +1,3 @@
 @echo off
-cd /d "%~dp0\"
-python ./ssd_controller.py %1 %2 %3
+set PYTHONPATH=%~dp0
+python %~dp0\core\ssd_controller.py %1 %2 %3
