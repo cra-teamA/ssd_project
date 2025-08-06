@@ -1,7 +1,9 @@
 import pytest
-from unittest.mock import MagicMock, patch
 
 from shell.shell import Shell
+from scripts.FullWriteReadCompare import FullWriteReadCompare
+from scripts.PartialLBAWrite import PartialLBAWrite
+from scripts.WriteReadAging import WriteReadAging
 
 
 @pytest.fixture
@@ -9,40 +11,28 @@ def shell():
     return Shell()
 
 
-@patch("scripts.FullWriteReadCompare.FullWriteReadCompare")
-def test_run_script_full_write_read_compare(mock_script, shell, capsys):
-    instance = MagicMock()
-    instance.run.return_value = True
-    mock_script.return_value = instance
+def test_run_script_pass(mocker, shell):
+    # 각 스크립트 run()이 True 리턴하도록 패치
+    for command, cls in [
+        ("1_FullWriteReadCompare", FullWriteReadCompare),
+        ("2_PartialLBAWrite", PartialLBAWrite),
+        ("3_WriteReadAging", WriteReadAging),
+    ]:
+        run_mock = mocker.patch.object(cls, "run", return_value=True)
+        print_mock = mocker.patch("builtins.print")
+
+        shell.run_script(command)
+
+        run_mock.assert_called_once()
+        print_mock.assert_called_with("PASS")
+
+
+def test_run_script_fail(mocker, shell):
+    # run()이 False 반환하는 경우 테스트
+    run_mock = mocker.patch.object(FullWriteReadCompare, "run", return_value=False)
+    print_mock = mocker.patch("builtins.print")
 
     shell.run_script("1_FullWriteReadCompare")
 
-    captured = capsys.readouterr()
-    assert "PASS" in captured.out
-    instance.run.assert_called_once()
-
-
-@patch("scripts.PartialLBAWrite.PartialLBAWrite")
-def test_run_script_partial_lba_write(mock_script, shell, capsys):
-    instance = MagicMock()
-    instance.run.return_value = False
-    mock_script.return_value = instance
-
-    shell.run_script("2_PartialLBAWrite")
-
-    captured = capsys.readouterr()
-    assert "FAIL" in captured.out
-    instance.run.assert_called_once()
-
-
-@patch("scripts.WriteReadAging.WriteReadAging")
-def test_run_script_write_read_aging(mock_script, shell, capsys):
-    instance = MagicMock()
-    instance.run.return_value = False
-    mock_script.return_value = instance
-
-    shell.run_script("3_WriteReadAging")
-
-    captured = capsys.readouterr()
-    assert "FAIL" in captured.out
-    instance.run.assert_called_once()
+    run_mock.assert_called_once()
+    print_mock.assert_called_with("FAIL")

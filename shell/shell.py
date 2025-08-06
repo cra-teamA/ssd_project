@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from scripts.ScriptRunner import ScriptRunner
 
 MIN_LBA = 0
 MAX_LBA = 99
@@ -98,31 +99,12 @@ class Shell:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
 
     def run_script(self, command):
-        from scripts.FullWriteReadCompare import FullWriteReadCompare
-        from scripts.PartialLBAWrite import PartialLBAWrite
-        from scripts.WriteReadAging import WriteReadAging
+        runner = ScriptRunner(self)
+        result = runner.run(command)
 
-        # 커맨드 번호와 클래스 매핑
-        script_mapping = {
-            "1": FullWriteReadCompare,
-            "2": PartialLBAWrite,
-            "3": WriteReadAging,
-        }
-
-        parts = command.split("_", 1)
-        idx_part = parts[0]
-        name_part = parts[1] if len(parts) > 1 else ""
-
-        ret = None
-
-        script_class = script_mapping.get(idx_part)
-
-        script = script_class(self)
-        ret = script.run()
-
-        if ret is True:
+        if result is True:
             print("PASS")
-        elif ret is False:
+        elif result is False:
             print("FAIL")
 
 def is_invalid_command(command):

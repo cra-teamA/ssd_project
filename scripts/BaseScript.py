@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from shell.shell import Shell
 
 class BaseScript(ABC):
 
-    def __init__(self, shell_interface : Shell):
+    def __init__(self, shell_interface):
         self.shell = shell_interface  # read/write interface
         self.isCommandFromScript = True
 
