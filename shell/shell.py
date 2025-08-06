@@ -3,7 +3,7 @@ import subprocess
 MIN_LBA = 0
 MAX_LBA = 99
 MAX_VALUE_LENGTH = 10
-
+ERROR = "ERROR"
 
 class Shell:
     def __init__(self):
@@ -11,18 +11,29 @@ class Shell:
 
     def read(self, read_command):
         lba = self.get_lba_from_read_command(read_command)
+        line = self._read(lba)
+        if line == ERROR:
+            print(f"[Read] {ERROR}")
+        else:
+            print(f"[Read] LBA {lba} : {line}")
+        return line
+
+    def _read(self, lba):
         subprocess.run(
-            [ "ssd", "R", lba],
+            ["ssd", "R", lba],
             capture_output=True,
             text=True
         )
         output = 'ssd_output.txt'
         with open(output, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
-        if line == "ERROR":
-            print("[Read] ERROR")
-        else:
-            print(f"[Read] LBA {lba} : {line}")
+        return line
+
+    def full_read(self):
+        print('[Full Read]')
+        for lba in range(MIN_LBA, MAX_LBA + 1):
+            print(f'LBA {lba:02d} : {self._read(lba)}')
+
 
     def help(self):
         print('''
