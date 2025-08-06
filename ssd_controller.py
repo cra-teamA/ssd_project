@@ -50,7 +50,7 @@ class SSDController:
             return True
         if not isinstance(val, str):
             return True
-        if len(val) > 10:
+        if len(val) != 10:
             return True
         if not (val.startswith('0x') or val.startswith('0X')):
             return True
