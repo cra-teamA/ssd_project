@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 MIN_LBA = 0
 MAX_LBA = 99
@@ -42,7 +43,6 @@ class Shell:
         for lba in range(MIN_LBA, MAX_LBA + 1):
             print(f'LBA {lba:02d} : {self._read(lba)}')
 
-
     def help(self):
         print('''
         제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은
@@ -57,6 +57,10 @@ class Shell:
          8. exit: exit
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
               )
+
+    def exit(self):
+        print("Exiting shell...")
+        sys.exit(0)
 
     def get_lba_from_read_command(self, read_command: str) -> str:
         lba = read_command.split()[1]
@@ -92,6 +96,7 @@ class Shell:
 
     def _is_invalid_value(self, value: str) -> bool:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
+
 
 def is_valid_command():
     cli = input("Shell > ")
