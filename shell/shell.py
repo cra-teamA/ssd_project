@@ -15,7 +15,7 @@ class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command):
+    def read(self, read_command, is_script):
         parts = read_command.split()
         if len(parts) != 2:
             raise ValueError
@@ -23,10 +23,11 @@ class Shell:
         if self._is_invalid_lba(lba):
             raise ValueError
         line = self._read(lba)
-        if line == ERROR:
-            print(f"[Read] {ERROR}")
-        else:
-            print(f"[Read] LBA {lba} : {line}")
+        if not is_script:
+            if line == ERROR:
+                print(f"[Read] {ERROR}")
+            else:
+                print(f"[Read] LBA {lba} : {line}")
         return line
 
     def _read(self, lba):
