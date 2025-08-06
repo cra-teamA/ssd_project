@@ -29,3 +29,4 @@ def test_read_lba_calls_shell_read_and_returns_value(mocker):
 
     mock_shell.read.assert_called_once_with('read 3', True)
     assert result == "0x12345678"
+

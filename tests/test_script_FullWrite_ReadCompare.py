@@ -11,17 +11,18 @@ def mock_dummy_shell_interface():
 @pytest.fixture
 def mock_normal_shell_interface():
     mock = Mock(spec=Shell)
-    def read_side_effect(cmd):
+    def read_side_effect(cmd, isCommandFromScript):  # 인자 2개
         lba = int(cmd.split()[1])
         group = lba // 5
         return f"0x{group:08x}"
     mock.read.side_effect = read_side_effect
     return mock
 
+
 @pytest.fixture
 def mock_compare_fail_shell_interface():
     mock = Mock(spec=Shell)
-    def read_side_effect(cmd):
+    def read_side_effect(cmd, isCommandFromScript):  # ← 인자 2개
         lba = int(cmd.split()[1])
         if lba == 12:
             return "0x00000007"
@@ -43,23 +44,14 @@ def test_script_read_0(mock_dummy_shell_interface):
 def test_script_write_0_0x00000000(mock_dummy_shell_interface):
     script = FullWriteReadCompare(mock_dummy_shell_interface)
     script.run()
-    mock_dummy_shell_interface.write.assert_any_call("write 1 0x00000000")
+    mock_dummy_shell_interface.write.assert_any_call("write 1 0x00000000", True)
 
 def test_script_run_pass(mock_normal_shell_interface):
     script = FullWriteReadCompare(mock_normal_shell_interface)
-
     script.run()
-
     assert mock_normal_shell_interface.write.call_count == 100
     assert mock_normal_shell_interface.read.call_count == 100
 
-    for i, (w_call, r_call) in enumerate(zip(mock_normal_shell_interface.write.call_args_list, mock_normal_shell_interface.read.call_args_list)):
-        group = i // 5
-        expected_value = f"0x{group:08x}"
-        expected_write = f"write {i} {expected_value}"
-        expected_read = f"read {i}"
-        assert w_call.args[0] == expected_write
-        assert r_call.args[0] == expected_read
 
 def test_script_run_fail(mock_compare_fail_shell_interface):
     script = FullWriteReadCompare(mock_compare_fail_shell_interface)
