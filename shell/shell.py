@@ -15,7 +15,7 @@ class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command, is_script):
+    def read(self, read_command, is_script:bool = False):
         parts = read_command.split()
         if len(parts) != 2:
             raise ValueError
