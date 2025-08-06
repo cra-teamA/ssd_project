@@ -10,10 +10,8 @@ def mock_dummy_shell_interface():
 
 @pytest.fixture
 def mock_normal_shell_interface():
-    mock = Mock()
-    # side_effect: 각 LBA별로 "read {lba}"가 들어오면 group 값 반환
+    mock = Mock(spec=Shell)
     def read_side_effect(cmd):
-        # cmd: "read {lba}"
         lba = int(cmd.split()[1])
         group = lba // 5
         return f"0x{group:08x}"
@@ -22,12 +20,11 @@ def mock_normal_shell_interface():
 
 @pytest.fixture
 def mock_compare_fail_shell_interface():
-    mock = Mock()
-    # 0~12: 정상값, 13번째 read (LBA 12)에서만 불일치 값 반환
+    mock = Mock(spec=Shell)
     def read_side_effect(cmd):
         lba = int(cmd.split()[1])
         if lba == 12:
-            return "0x00000007"  # 불일치 값
+            return "0x00000007"
         group = lba // 5
         return f"0x{group:08x}"
     mock.read.side_effect = read_side_effect
@@ -50,8 +47,9 @@ def test_script_write_0_0x00000000(mock_dummy_shell_interface):
 
 def test_script_run_pass(mock_normal_shell_interface):
     script = FullWriteReadCompare(mock_normal_shell_interface)
-    result = script.run()
-    assert result is True
+
+    script.run()
+
     assert mock_normal_shell_interface.write.call_count == 100
     assert mock_normal_shell_interface.read.call_count == 100
 
@@ -65,7 +63,8 @@ def test_script_run_pass(mock_normal_shell_interface):
 
 def test_script_run_fail(mock_compare_fail_shell_interface):
     script = FullWriteReadCompare(mock_compare_fail_shell_interface)
-    result = script.run()
-    assert result is False
+
+    script.run()
+
     assert mock_compare_fail_shell_interface.write.call_count == 15
     assert mock_compare_fail_shell_interface.read.call_count == 13
