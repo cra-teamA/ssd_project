@@ -1,2 +1,7 @@
-.env
+.venv
 .idea
+*egg-info*
+*__pycache__*
+ssd_nand.txt
+ssd_output.txt
+build/
