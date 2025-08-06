@@ -6,11 +6,11 @@ class BaseScript(ABC):
         self.shell = shell_interface  # read/write interface
         self.isCommandFromScript = True
 
-    def write_lba(self, lba : str, data : str):
+    def write_lba(self, lba : int, data : str):
         cmd = f"write {lba} {data}"
         self.shell.write(cmd,self.isCommandFromScript)
 
-    def read_lba(self, lba: str):
+    def read_lba(self, lba: int):
         cmd = f"read {lba}"
         return self.shell.read(cmd,self.isCommandFromScript)
 

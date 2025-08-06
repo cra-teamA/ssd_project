@@ -1,6 +1,10 @@
 import os
 import subprocess
 import sys
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 from scripts.ScriptRunner import ScriptRunner
 
 MIN_LBA = 0
@@ -9,7 +13,6 @@ MAX_VALUE_LENGTH = 10
 ERROR = "ERROR"
 VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread", "1_", "2_", "3_",
                  "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
-PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
 
@@ -107,25 +110,17 @@ class Shell:
         elif result is False:
             print("FAIL")
 
-def is_invalid_command(command):
-    if not command.startswith(tuple(VALID_COMMAND)):
-        print("INVALID COMMAND")
-        return True
-    return False
-
 def main():
     shell = Shell()
-    while(1):
+    while (1):
         command = input("Shell > ")
-        if is_invalid_command(command):
-            continue
         try:
             command_prefix = command.split()[0]
             if command_prefix == "write":
                 shell.write(command)
             elif command_prefix == "read":
                 shell.read(command)
-            if command_prefix == "fullwrite":
+            elif command_prefix == "fullwrite":
                 shell.fullwrite(command)
             elif command_prefix == "fullread":
                 shell.fullread()
@@ -133,6 +128,8 @@ def main():
                 shell.help()
             elif command_prefix == "exit":
                 shell.exit()
+            else:
+                shell.run_script(command)
         except ValueError:
             print("INVALID COMMAND")
 

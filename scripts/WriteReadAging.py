@@ -1,6 +1,7 @@
 from .BaseScript import BaseScript
 import random
 
+
 class WriteReadAging(BaseScript):
     def __init__(self, shell_interface):
         super().__init__(shell_interface)
@@ -9,8 +10,10 @@ class WriteReadAging(BaseScript):
         LOOP_COUNT = 100
 
         for _ in range(LOOP_COUNT):
-            data1 = random.randint(1, 0x7fffffff)
-            data2 = random.randint(1, 0x7fffffff)
+            value1 = random.randint(1, 0x7fffffff)
+            value2 = random.randint(1, 0x7fffffff)
+            data1 = f"0x{value1:08x}"
+            data2 = f"0x{value2:08x}"
 
             self.write_lba(0, data1)
             self.write_lba(99, data2)
