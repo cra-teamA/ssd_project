@@ -12,7 +12,7 @@ class Shell:
     def read(self, read_command):
         lba = self.get_lba_from_read_command(read_command)
         subprocess.run(
-            ["python", "ssd.py", "R", lba],
+            [ "ssd", "R", lba],
             capture_output=True,
             text=True
         )
@@ -23,6 +23,21 @@ class Shell:
             print("[Read] ERROR")
         else:
             print(f"[Read] LBA {lba} : {line}")
+
+    def help(self):
+        print('''
+        제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은
+        명령어 사용 법 :
+         1. read: read [LBA]
+         2. write: write [LBA] [VALUE]
+         3. fullwrite: fullwrite [VALUE]
+         4. fullread: fullread
+         5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력
+         6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력
+         7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력
+         8. exit: exit
+        그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
+        )
 
     def get_lba_from_read_command(self, read_command: str) -> str:
         lba = read_command.split()[1]
