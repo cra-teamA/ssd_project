@@ -7,6 +7,7 @@ ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
+DEFAULT_VALUE = '0x00000000'
 
 
 class SSDController:
@@ -14,14 +15,13 @@ class SSDController:
         self.validator = ControllerValidator()
 
     def read(self, addr: int):
-        try:
-            if addr < 0 or addr > 99:
-                raise Exception
-            with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f).get(str(addr))
-            self.output(data)
-        except:
+        if self.validator.is_lba_bad(addr):
             self.output(ERROR)
+            return
+
+        with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f).get(str(addr), DEFAULT_VALUE)
+            self.output(data)
 
     def write(self, addr: int, val: str) -> bool:
         if self.validator.is_lba_bad(addr) or self.validator.is_value_bad(val):
@@ -44,7 +44,6 @@ class SSDController:
     def _temp_read_for_test(self, addr: int):
         with open(SSD_NAND_PATH, "r") as f:
             return json.load(f).get(str(addr))
-
 
     def check_output_msg(self):
         with open(SSD_OUTPUT_PATH, 'r') as f:
