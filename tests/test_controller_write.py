@@ -16,10 +16,12 @@ def test_write_valid_addr():
     ssd = SSDController()
     assert ssd.write(0, '0x10000000') == True
 
+
 @pytest.mark.parametrize("invalid_addr", [100, -1, '100', None])
 def test_write_invalid_addr(invalid_addr):
     ssd = SSDController()
     assert ssd.write(invalid_addr, '0x100') == False
+
 
 @pytest.mark.parametrize("valid_val", ['0x0fffff01', '0X00000000', '0xf000000f', '0xFfFAFAAA'])
 def test_write_valid_val(valid_val):
@@ -33,10 +35,12 @@ def test_write_invalid_val(invalid_val):
     ssd = SSDController()
     assert ssd.write(0, invalid_val) == False
 
+
 def get_ssd_output():
     with open(SSD_OUTPUT_PATH, "r", encoding="utf-8") as f:
         actual = f.read()
     return actual
+
 
 @pytest.mark.parametrize("addr, val", [(99, '0x10000000'), (10, '0x10f0000f')])
 def test_write_right_written(addr, val):
