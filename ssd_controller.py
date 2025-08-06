@@ -14,7 +14,7 @@ class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
 
-    def read(self, addr: int):
+    def read(self, addr: int) -> None:
         try:
             if self.validator.is_lba_bad(addr):
                 self.output(ERROR)
@@ -38,7 +38,7 @@ class SSDController:
             self.output(ERROR)
             return False
 
-    def update_nand_txt(self, addr, val):
+    def update_nand_txt(self, addr, val) -> None:
         if not os.path.exists(SSD_NAND_PATH):
             with open(SSD_NAND_PATH, 'w') as f:
                 json.dump({}, f)
