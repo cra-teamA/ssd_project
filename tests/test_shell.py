@@ -1,8 +1,9 @@
 from unittest.mock import mock_open
 import pytest
 from pytest_mock import mocker, MockerFixture
-from shell.shell import Shell, is_valid_command
+from shell.shell import Shell, is_valid_command, SSD_OUTPUT_PATH, SSD_COMMAND
 from unittest.mock import call
+
 
 @pytest.fixture
 def shell_and_subprocess_mocker(mocker: MockerFixture):
@@ -75,7 +76,7 @@ def test_shell_read_valid_format(mocker: MockerFixture, capsys):
     captured = capsys.readouterr()
 
     mock_subprocess.assert_called_once_with(
-        ["ssd", "R", "3"],
+        [SSD_COMMAND, "R", "3"],
         capture_output=True,
         text=True
     )
@@ -139,7 +140,7 @@ def test_shell_write_cmd_success(capsys, shell_and_subprocess_mocker, value):
 
     captured = capsys.readouterr()
     assert captured.out == "[Write] Done\n"
-    mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
+    mock_run.assert_called_once_with([SSD_COMMAND, "W", "3", "0x0000BBBB"])
 
 
 @pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
@@ -149,7 +150,7 @@ def test_shell_write_script_success(capsys, shell_and_subprocess_mocker, value):
 
     captured = capsys.readouterr()
     assert captured.out == ""
-    mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
+    mock_run.assert_called_once_with([SSD_COMMAND, "W", "3", "0x0000BBBB"])
 
 
 @pytest.mark.parametrize("lba", ["-1", "100"])
@@ -179,7 +180,7 @@ def test_shell_fullwrite_success(capsys, shell_and_subprocess_mocker, value):
     assert captured.out == "[FullWrite] Done\n"
 
     expected_calls = [
-        call(["ssd", "W", str(i), "0x0000BBBB"]) for i in range(100)
+        call([SSD_COMMAND, "W", str(i), "0x0000BBBB"]) for i in range(100)
     ]
     assert mock_run.call_args_list == expected_calls
 
