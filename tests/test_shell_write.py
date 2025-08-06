@@ -24,25 +24,21 @@ def test_shell_write(capsys, shell_and_subprocess_mocker, value):
 
 
 @pytest.mark.parametrize("lba", ["-1", "100"])
-def test_shell_write_valid_check_lba(capsys, shell_and_subprocess_mocker, lba):
+def test_shell_write_valid_check_lba(shell_and_subprocess_mocker, lba):
     shell, mock_run = shell_and_subprocess_mocker
-    shell.write(f"write {lba} 0xAAAABBBB")
 
-    captured = capsys.readouterr()
-    assert captured.out == INVALID_MSG
+    with pytest.raises(ValueError):
+        shell.write(f"write {lba} 0xAAAABBBB")
     assert mock_run.call_count == 0
+
 
 @pytest.mark.parametrize("value", ["0xAAAAABBBB", "0xAAAAFFFK", "AAAAFFF"])
-def test_shell_write_valid_check_value(capsys, shell_and_subprocess_mocker, value):
+def test_shell_write_valid_check_value(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
 
-    
-    shell.write(f"write 3 {value}")
-    captured = capsys.readouterr()
-    assert captured.out == INVALID_MSG
+    with pytest.raises(ValueError):
+        shell.write(f"write 3 {value}")
     assert mock_run.call_count == 0
-
-
 
 
 @pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
@@ -60,10 +56,9 @@ def test_shell_fullwrite(capsys, shell_and_subprocess_mocker, value):
 
 
 @pytest.mark.parametrize("value", ["0xAAAAABBBB", "0xAAAAFFFK", "AAAAFFF"])
-def test_shell_fullwrite_valid_check_value(capsys, shell_and_subprocess_mocker, value):
+def test_shell_fullwrite_valid_check_value(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
-   
-    shell.fullwrite(f"write {value}")
-    captured = capsys.readouterr()
-    assert captured.out == INVALID_MSG
+
+    with pytest.raises(ValueError):
+        shell.fullwrite(f"write {value}")
     assert mock_run.call_count == 0
