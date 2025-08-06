@@ -1,35 +1,44 @@
 import json, os
 import argparse
 
+from validator import ControllerValidator
+
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
+DEFAULT_VALUE = '0x00000000'
 
 
 class SSDController:
     def __init__(self):
-        ...
+        self.validator = ControllerValidator()
 
-    def read(self, addr: int):
+    def read(self, addr: int) -> None:
         try:
-            if addr < 0 or addr > 99:
-                raise Exception
+            if self.validator.is_lba_bad(addr):
+                self.output(ERROR)
+                return
+
             with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
-                data = json.load(f).get(str(addr))
-            self.output(data)
+                data = json.load(f).get(str(addr), DEFAULT_VALUE)
+                self.output(data)
         except:
             self.output(ERROR)
 
     def write(self, addr: int, val: str) -> bool:
-        if self.is_invalid_input(addr, val):
+        try:
+            if self.validator.is_lba_bad(addr) or self.validator.is_value_bad(val):
+                self.output(ERROR)
+                return False
+
+            self.update_nand_txt(addr, val)
+            return True
+        except:
             self.output(ERROR)
             return False
 
-        self.update_nand_txt(addr, val)
-        return True
-
-    def update_nand_txt(self, addr, val):
+    def update_nand_txt(self, addr, val) -> None:
         if not os.path.exists(SSD_NAND_PATH):
             with open(SSD_NAND_PATH, 'w') as f:
                 json.dump({}, f)
@@ -38,27 +47,6 @@ class SSDController:
             memory[str(addr)] = val.lower()
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
-
-    def _temp_read_for_test(self, addr: int):
-        with open(SSD_NAND_PATH, "r") as f:
-            return json.load(f).get(str(addr))
-
-    def is_invalid_input(self, addr: int, val: str) -> bool:
-        ADDR_MIN = 0
-        ADDR_MAX = 99
-        if not isinstance(addr, int):
-            return True
-        if addr < ADDR_MIN or addr > ADDR_MAX:
-            return True
-        if not isinstance(val, str):
-            return True
-        if len(val) != 10:
-            return True
-        if not (val.startswith('0x') or val.startswith('0X')):
-            return True
-        if not set(val[2:]).issubset(set("0123456789abcdefABCDEF")):
-            return True
-        return False
 
     def check_output_msg(self):
         with open(SSD_OUTPUT_PATH, 'r') as f:
