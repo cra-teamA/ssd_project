@@ -1,6 +1,8 @@
 import json, os
 import argparse
 
+from validator import ControllerValidator
+
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
@@ -9,7 +11,7 @@ SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 
 class SSDController:
     def __init__(self):
-        ...
+        self.validator = ControllerValidator()
 
     def read(self, addr: int):
         try:
@@ -44,19 +46,9 @@ class SSDController:
             return json.load(f).get(str(addr))
 
     def is_invalid_input(self, addr: int, val: str) -> bool:
-        ADDR_MIN = 0
-        ADDR_MAX = 99
-        if not isinstance(addr, int):
+        if self.validator.check_lba(addr):
             return True
-        if addr < ADDR_MIN or addr > ADDR_MAX:
-            return True
-        if not isinstance(val, str):
-            return True
-        if len(val) != 10:
-            return True
-        if not (val.startswith('0x') or val.startswith('0X')):
-            return True
-        if not set(val[2:]).issubset(set("0123456789abcdefABCDEF")):
+        if self.validator.check_value(val):
             return True
         return False
 

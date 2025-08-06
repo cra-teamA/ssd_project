@@ -29,14 +29,14 @@ def test_write_invalid_val(invalid_val):
     assert ssd.write(0, invalid_val) == False
 
 
-@pytest.mark.parametrize("addr, val", [(99, '0x100'), (10, '0x10ff')])
+@pytest.mark.parametrize("addr, val", [(99, '0x10000000'), (10, '0x10f0000f')])
 def test_write_right_written(addr, val):
     ssd = SSDController()
     ssd.write(addr, val)
     assert ssd._temp_read_for_test(addr) == val
 
 
-@pytest.mark.parametrize("addr, val", [(99, '0x100'), (10, '0x10ff')])
+@pytest.mark.parametrize("addr, val", [(99, '0x10000000'), (10, '0x10f0000f')])
 def test_write_right_written(addr, val):
     ssd = SSDController()
     ssd.write(addr, val)
