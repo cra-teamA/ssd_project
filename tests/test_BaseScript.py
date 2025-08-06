@@ -17,7 +17,7 @@ def test_write_lba_calls_shell_write(mocker):
 
     script.write_lba("3", "0xABCDEF12")
 
-    mock_shell.write.assert_called_once_with("write 3 0xABCDEF12")
+    mock_shell.write.assert_called_once_with("write 3 0xABCDEF12",True)
 
 
 def test_read_lba_calls_shell_read_and_returns_value(mocker):
@@ -27,5 +27,5 @@ def test_read_lba_calls_shell_read_and_returns_value(mocker):
 
     result = script.read_lba("3")
 
-    mock_shell.read.assert_called_once_with("3")
+    mock_shell.read.assert_called_once_with('read 3', True)
     assert result == "0x12345678"
