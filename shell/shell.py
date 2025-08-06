@@ -10,12 +10,14 @@ VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread
                  "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
+SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
+
 
 class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command, is_script:bool = False):
+    def read(self, read_command, is_script: bool = False):
         parts = read_command.split()
         if len(parts) != 2:
             raise ValueError
@@ -32,7 +34,7 @@ class Shell:
 
     def _read(self, lba):
         subprocess.run(
-            ["ssd", "R", lba],
+            [SSD_COMMAND, "R", lba],
             capture_output=True,
             text=True
         )
@@ -41,10 +43,10 @@ class Shell:
             line = file.readline().strip()
         return line
 
-    def full_read(self):
+    def fullread(self):
         print('[Full Read]')
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            print(f'LBA {lba:02d} : {self._read(lba)}')
+            print(f'LBA {lba:02d} : {self._read(str(lba))}')
 
     def help(self):
         print('''
@@ -75,7 +77,7 @@ class Shell:
             raise ValueError
         if self._is_invalid_value(value):
             raise ValueError
-        subprocess.run(["ssd", "W", lba, f"0x{int(value, 16) :08X}"])
+        subprocess.run([SSD_COMMAND, "W", lba, f"0x{int(value, 16) :08X}"])
 
         if not is_script:
             print("[Write] Done")
@@ -86,7 +88,7 @@ class Shell:
         if self._is_invalid_value(value):
             raise ValueError
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            subprocess.run(["ssd", "W", str(lba), f"0x{int(value, 16) :08X}"])
+            subprocess.run([SSD_COMMAND, "W", str(lba), f"0x{int(value, 16) :08X}"])
         print("[FullWrite] Done")
 
     def _is_invalid_lba(self, lba: str) -> bool:
@@ -123,11 +125,34 @@ class Shell:
         elif ret is False:
             print("FAIL")
 
-def is_valid_command():
-    cli = input("Shell > ")
-    if not cli.startswith(tuple(VALID_COMMAND)):
+def is_invalid_command(command):
+    if not command.startswith(tuple(VALID_COMMAND)):
         print("INVALID COMMAND")
-        return False
-    return True
+        return True
+    return False
 
+def main():
+    shell = Shell()
+    while(1):
+        command = input("Shell > ")
+        if is_invalid_command(command):
+            continue
+        try:
+            command_prefix = command.split()[0]
+            if command_prefix == "write":
+                shell.write(command)
+            elif command_prefix == "read":
+                shell.read(command)
+            if command_prefix == "fullwrite":
+                shell.fullwrite(command)
+            elif command_prefix == "fullread":
+                shell.fullread()
+            elif command_prefix == "help":
+                shell.help()
+            elif command_prefix == "exit":
+                shell.exit()
+        except ValueError:
+            print("INVALID COMMAND")
 
+if __name__ == "__main__":
+    main()
