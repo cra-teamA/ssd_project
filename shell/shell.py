@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -7,7 +8,8 @@ MAX_VALUE_LENGTH = 10
 ERROR = "ERROR"
 VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread", "1_", "2_", "3_",
                  "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
-
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 
 class Shell:
     def __init__(self):
@@ -33,7 +35,7 @@ class Shell:
             capture_output=True,
             text=True
         )
-        output = 'ssd_output.txt'
+        output = SSD_OUTPUT_PATH
         with open(output, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
         return line
