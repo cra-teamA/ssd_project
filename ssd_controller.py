@@ -1,12 +1,14 @@
 import json, os
 
 SSD_NAND_PATH = 'ssd_nand.txt'
+SSD_OUTPUT_PATH = 'ssd_output.txt'
 
 
 class SSDController:
     def write(self, addr: int, val: str) -> bool:
         if self.is_invalid_input(addr, val):
-            # OUTPUT 파일 ERROR 기입
+            with open(SSD_OUTPUT_PATH, 'w') as f:
+                json.dump("ERROR", f)
             return False
         if not os.path.exists(SSD_NAND_PATH):
             with open(SSD_NAND_PATH, 'w') as f:
@@ -41,4 +43,6 @@ class SSDController:
         return False
 
     def check_output_msg(self):
-        return 'ERROR'
+        with open(SSD_OUTPUT_PATH, 'r') as f:
+            msg = json.load(f)
+        return msg
