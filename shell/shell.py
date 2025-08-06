@@ -69,7 +69,12 @@ class Shell:
 
     def fullwrite(self, read_command: str):
         _, value = read_command.split()
-
-        for lba in range(MIN_LBA,MAX_LBA+1):
-            subprocess.run(["ssd", "W", str(lba), f"0x{int(value, 16) :08X}"])
-        print("[FullWrite] Done")
+        try:
+            if len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X"):
+                raise ValueError
+            for lba in range(MIN_LBA,MAX_LBA+1):
+                subprocess.run(["ssd", "W", str(lba), f"0x{int(value, 16) :08X}"])
+            print("[FullWrite] Done")
+        except ValueError:
+            print("INVALID COMMAND")
+            return

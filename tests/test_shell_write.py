@@ -66,3 +66,30 @@ def test_shell_fullwrite(capsys, shell_and_subprocess_mocker):
         call(["ssd", "W", str(i), "0xAAAABBBB"]) for i in range(100)
     ]
     assert mock_run.call_args_list == expected_calls
+
+def test_shell_fullwrite_valid_check_value(capsys, shell_and_subprocess_mocker):
+    shell, mock_run = shell_and_subprocess_mocker
+
+    shell.fullwrite("write 0xAAAAABBBB")
+    captured = capsys.readouterr()
+    assert captured.out == INVALID_MSG
+    assert mock_run.call_count == 0
+
+    shell.fullwrite("write 0xAAAAFFFK")
+    captured = capsys.readouterr()
+    assert captured.out == INVALID_MSG
+    assert mock_run.call_count == 0
+
+    shell.fullwrite("write AAAAFFF")
+    captured = capsys.readouterr()
+    assert captured.out == INVALID_MSG
+    assert mock_run.call_count == 0
+
+    shell.fullwrite("write 0xBBBB")
+    captured = capsys.readouterr()
+    assert captured.out == "[FullWrite] Done\n"
+
+    expected_calls = [
+        call(["ssd", "W", str(i), "0x0000BBBB"]) for i in range(100)
+    ]
+    assert mock_run.call_args_list == expected_calls
