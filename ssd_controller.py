@@ -20,7 +20,7 @@ class SSDController:
             f.write(data)
 
     def write(self,addr, value):
-        pass
+        return True
 
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
