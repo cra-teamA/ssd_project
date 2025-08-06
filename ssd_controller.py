@@ -44,9 +44,11 @@ class SSDController:
             return json.load(f).get(str(addr))
 
     def is_invalid_input(self, addr: int, val: str) -> bool:
+        ADDR_MIN = 0
+        ADDR_MAX = 99
         if not isinstance(addr, int):
             return True
-        if addr < 0 or addr > 99:
+        if addr < ADDR_MIN or addr > ADDR_MAX:
             return True
         if not isinstance(val, str):
             return True
@@ -65,6 +67,8 @@ class SSDController:
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
+
+
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
     parser.add_argument("mode", choices=["R", "W"], help="모드 선택: R(Read) 또는 W(Write)")
