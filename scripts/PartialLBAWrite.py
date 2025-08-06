@@ -6,4 +6,14 @@ class PartialLBAWrite(BaseScript):
         super().__init__(shell_interface)
 
     def run(self):
-        pass
+        lbas = [4, 0, 3, 1, 2]
+        LOOP_COUNT = 30
+
+        for data in range(LOOP_COUNT):
+            for lba in lbas:
+                self.write_lba(lba, data)
+
+            for lba in lbas:
+                if self.read_lba(lba) != data:
+                    return False
+        return True

@@ -1,12 +1,15 @@
 import pytest
 from scripts.WriteReadAging import WriteReadAging
+from shell.shell import Shell
 
-def test_partial_lba_write_class_can_be_instantiated():
-    instance = WriteReadAging('test_interface')
+
+def test_partial_lba_write_class_can_be_instantiated(mocker):
+    mock_shell = mocker.Mock(spec=Shell)
+    instance = WriteReadAging(mock_shell)
     assert isinstance(instance, WriteReadAging)
 
 def test_write_read_aging_succeeds(mocker):
-    mock_shell = mocker.Mock()
+    mock_shell = mocker.Mock(spec=Shell)
 
     # LBA마다 읽은 값이 항상 쓰인 값과 같도록 설정
     lba_memory = {}
@@ -26,7 +29,7 @@ def test_write_read_aging_succeeds(mocker):
     assert result is True
 
 def test_write_read_aging_fails_when_data_mismatch(mocker):
-    mock_shell = mocker.Mock()
+    mock_shell = mocker.Mock(spec=Shell)
 
     def fake_write(addr, data):
         pass  # write는 무시
