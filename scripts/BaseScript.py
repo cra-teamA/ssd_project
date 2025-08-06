@@ -10,9 +10,9 @@ class BaseScript(ABC):
         cmd = f"write {lba} {data}"
         self.shell.write(cmd)
 
-    def read_lba(self, lba : str):
+    def read_lba(self, lba: str):
         cmd = f"read {lba}"
-        return self.shell.read(lba)
+        return self.shell.read(cmd)
 
     @abstractmethod
     def run(self):
