@@ -95,6 +95,33 @@ class Shell:
     def _is_invalid_value(self, value: str) -> bool:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
 
+    def run_script(self, command):
+        from scripts.FullWriteReadCompare import FullWriteReadCompare
+        from scripts.PartialLBAWrite import PartialLBAWrite
+        from scripts.WriteReadAging import WriteReadAging
+
+        # 커맨드 번호와 클래스 매핑
+        script_mapping = {
+            "1": FullWriteReadCompare,
+            "2": PartialLBAWrite,
+            "3": WriteReadAging,
+        }
+
+        parts = command.split("_", 1)
+        idx_part = parts[0]
+        name_part = parts[1] if len(parts) > 1 else ""
+
+        ret = None
+
+        script_class = script_mapping.get(idx_part)
+
+        script = script_class(self)
+        ret = script.run()
+
+        if ret is True:
+            print("PASS")
+        elif ret is False:
+            print("FAIL")
 
 def is_valid_command():
     cli = input("Shell > ")
@@ -102,3 +129,5 @@ def is_valid_command():
         print("INVALID COMMAND")
         return False
     return True
+
+
