@@ -44,8 +44,9 @@ def test_write_right_written(addr, val):
     ssd.write(addr, val)
     assert ssd._temp_read_for_test(addr) == val
 
-def test_write_check_output_file_when_invalid_input():
+@pytest.mark.parametrize("invalid_val", [100, -1, '100', None, '00', 'aa1', '0xkk',
+                                         '0x11111111111111111'])
+def test_write_check_output_file_when_invalid_input(invalid_val):
     ssd = SSDController()
-    ssd.write(-1, -1)
-    ssd.check_output_msg()
+    ssd.write(0, invalid_val)
     assert ssd.check_output_msg() == 'ERROR'
