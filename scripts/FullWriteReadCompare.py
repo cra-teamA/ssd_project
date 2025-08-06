@@ -15,17 +15,15 @@ class FullWriteReadCompare(BaseScript):
 
                 start_lba = group * group_size
                 end_lba = start_lba + group_size
-
                 for lba in range(start_lba, end_lba):
                     self.write_lba(lba, value)
 
                 for lba in range(start_lba, end_lba):
                     result = self.read_lba(lba)
                     if result != value:
-                        print("FAIL")
-                        return
-            print("PASS")
-            return
+                        return False
+
+            return True
         except Exception as e:
-            print("FAIL")
-            return
+            print(f"Exception during write/read: {e}")
+            return False
