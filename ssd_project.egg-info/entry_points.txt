@@ -1,2 +1,0 @@
-[console_scripts]
-ssd = ssd_controller:main
