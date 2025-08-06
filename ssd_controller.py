@@ -19,7 +19,7 @@ class SSDController:
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
 
-    def write(self,addr, value):
+    def write(self, addr: int, val: str) -> bool:
         return True
 
 def main():

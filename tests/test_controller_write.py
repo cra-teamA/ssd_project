@@ -7,6 +7,4 @@ def test_create_ssd_controller_instance():
 
 def test_write_addr():
     ssd = SSDController()
-    addr = 0
-    val = '100'
-    return ssd.write(addr, val) == True
+    return ssd.write(0, '100') == True
