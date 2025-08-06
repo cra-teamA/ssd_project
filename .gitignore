@@ -1,2 +1,5 @@
 .env
 .idea
+ssd_project.egg-info
+__pycache__
+build
