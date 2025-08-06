@@ -43,10 +43,10 @@ class Shell:
             line = file.readline().strip()
         return line
 
-    def full_read(self):
+    def fullread(self):
         print('[Full Read]')
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            print(f'LBA {lba:02d} : {self._read(lba)}')
+            print(f'LBA {lba:02d} : {self._read(str(lba))}')
 
     def help(self):
         print('''
@@ -98,9 +98,34 @@ class Shell:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
 
 
-def is_valid_command():
-    cli = input("Shell > ")
-    if not cli.startswith(tuple(VALID_COMMAND)):
+def is_invalid_command(command):
+    if not command.startswith(tuple(VALID_COMMAND)):
         print("INVALID COMMAND")
-        return False
-    return True
+        return True
+    return False
+
+def main():
+    shell = Shell()
+    while(1):
+        command = input("Shell > ")
+        if is_invalid_command(command):
+            continue
+        try:
+            command_prefix = command.split()[0]
+            if command_prefix == "write":
+                shell.write(command)
+            elif command_prefix == "read":
+                shell.read(command)
+            if command_prefix == "fullwrite":
+                shell.fullwrite(command)
+            elif command_prefix == "fullread":
+                shell.fullread()
+            elif command_prefix == "help":
+                shell.help()
+            elif command_prefix == "exit":
+                shell.exit()
+        except ValueError:
+            print("INVALID COMMAND")
+
+if __name__ == "__main__":
+    main()

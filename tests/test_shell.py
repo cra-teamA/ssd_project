@@ -1,7 +1,7 @@
 from unittest.mock import mock_open
 import pytest
 from pytest_mock import mocker, MockerFixture
-from shell.shell import Shell, is_valid_command, SSD_OUTPUT_PATH, SSD_COMMAND
+from shell.shell import Shell, is_invalid_command, SSD_OUTPUT_PATH, SSD_COMMAND
 from unittest.mock import call
 
 
@@ -14,13 +14,13 @@ def shell_and_subprocess_mocker(mocker: MockerFixture):
 
 def test_shell_command_valid(mocker: MockerFixture):
     mocker.patch("builtins.input", return_value="write")
-    ret = is_valid_command()
+    ret = is_invalid_command()
     assert ret is True
 
 
 def test_shell_command_invalid_foramt(mocker: MockerFixture, capsys):
     mocker.patch("builtins.input", return_value="hello")
-    ret = is_valid_command()
+    ret = is_invalid_command()
     output = capsys.readouterr()
     assert output.out == 'INVALID COMMAND\n'
     assert ret is False
@@ -39,7 +39,7 @@ def test_shell_full_read_valid(mocker: MockerFixture, capsys):
     mk_full_read = mocker.patch('shell.shell.Shell._read')
     mk_full_read.return_value = '0x00000000'
     shell = Shell()
-    shell.full_read()
+    shell.fullread()
     captured = capsys.readouterr()
     assert mk_full_read.call_count == 100
     mk_full_read.assert_has_calls([call(x) for x in range(100)])
