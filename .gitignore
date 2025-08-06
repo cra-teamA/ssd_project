@@ -1,2 +1,5 @@
-.env
+.venv
 .idea
+ssd_output.txt
+ssd_nand.txt
+ssd_project.egg-info

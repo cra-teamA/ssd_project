@@ -6,5 +6,13 @@ ssd_project.egg-info/SOURCES.txt
 ssd_project.egg-info/dependency_links.txt
 ssd_project.egg-info/entry_points.txt
 ssd_project.egg-info/top_level.txt
+tests/test_BaseScript.py
+tests/test_PartialLBAWrite.py
+tests/test_WriteReadAging.py
 tests/test_controller_read.py
 tests/test_controller_write.py
+tests/test_script_FullWrite_ReadCompare.py
+tests/test_shell_full_read.py
+tests/test_shell_help.py
+tests/test_shell_read.py
+tests/test_shell_write.py
