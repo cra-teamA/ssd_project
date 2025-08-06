@@ -1,26 +1,73 @@
-import json
+import json, os
 import argparse
 
 ERROR = 'ERROR'
-SSD_NAND_PATH = 'ssd_nand.txt'
-SSD_OUTPUT_PATH = 'ssd_output.txt'
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
+SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
+
+
 class SSDController:
     def __init__(self):
         ...
-    def read(self,addr:int):
-        if addr < 0 or addr > 99:
+
+    def read(self, addr: int):
+        try:
+            if addr < 0 or addr > 99:
+                raise Exception
+            with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f).get(str(addr))
+            self.output(data)
+        except:
             self.output(ERROR)
-            return
-        with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f).get(str(addr))
-        self.output(data)
+
+    def write(self, addr: int, val: str) -> bool:
+        if self.is_invalid_input(addr, val):
+            self.output(ERROR)
+            return False
+
+        self.update_nand_txt(addr, val)
+        return True
+
+    def update_nand_txt(self, addr, val):
+        if not os.path.exists(SSD_NAND_PATH):
+            with open(SSD_NAND_PATH, 'w') as f:
+                json.dump({}, f)
+        with open(SSD_NAND_PATH, "r") as f:
+            memory = json.load(f)
+            memory[str(addr)] = val.lower()
+        with open(SSD_NAND_PATH, "w") as f:
+            json.dump(memory, f)
+
+    def _temp_read_for_test(self, addr: int):
+        with open(SSD_NAND_PATH, "r") as f:
+            return json.load(f).get(str(addr))
+
+    def is_invalid_input(self, addr: int, val: str) -> bool:
+        ADDR_MIN = 0
+        ADDR_MAX = 99
+        if not isinstance(addr, int):
+            return True
+        if addr < ADDR_MIN or addr > ADDR_MAX:
+            return True
+        if not isinstance(val, str):
+            return True
+        if len(val) != 10:
+            return True
+        if not (val.startswith('0x') or val.startswith('0X')):
+            return True
+        if not set(val[2:]).issubset(set("0123456789abcdefABCDEF")):
+            return True
+        return False
+
+    def check_output_msg(self):
+        with open(SSD_OUTPUT_PATH, 'r') as f:
+            return f.read()
 
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
 
-    def write(self,addr, value):
-        pass
 
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
@@ -35,6 +82,7 @@ def main():
         controller.read(args.address)
     elif args.mode == "W":
         controller.write(args.address, args.value)
+
 
 if __name__ == "__main__":
     main()
