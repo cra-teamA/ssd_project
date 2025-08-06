@@ -1,9 +1,8 @@
-from scripts.BaseScript import BaseScript
-from shell.shell import Shell
+from .BaseScript import BaseScript
 
 class FullWriteReadCompare(BaseScript):
-    def __init__(self, shell_interface:Shell):
-        self.shell = shell_interface
+    def __init__(self, shell_interface):
+        super().__init__(shell_interface)
 
 
     def run(self):
@@ -18,14 +17,15 @@ class FullWriteReadCompare(BaseScript):
                 end_lba = start_lba + group_size
 
                 for lba in range(start_lba, end_lba):
-                    self.shell.write(f"W {lba} {value}")
+                    self.write_lba(lba, value)
 
                 for lba in range(start_lba, end_lba):
-                    result = self.shell.read(f"R {lba}")
+                    result = self.read_lba(lba)
                     if result != value:
-                        return False
-
-            return True
+                        print("FAIL")
+                        return
+            print("PASS")
+            return
         except Exception as e:
-            print(f"Exception during write/read: {e}")
-            return False
+            print("FAIL")
+            return
