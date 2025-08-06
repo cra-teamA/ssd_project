@@ -1,7 +1,7 @@
 from unittest.mock import mock_open
 import pytest
 from pytest_mock import mocker, MockerFixture
-from shell.shell import Shell, is_invalid_command, SSD_OUTPUT_PATH, SSD_COMMAND
+from shell.shell import Shell, SSD_OUTPUT_PATH, SSD_COMMAND
 from unittest.mock import call
 
 
@@ -11,23 +11,10 @@ def shell_and_subprocess_mocker(mocker: MockerFixture):
     mock_run = mocker.patch("shell.shell.subprocess.run")
     return shell, mock_run
 
-@pytest.mark.parametrize("command", ["write", "read", "exit", "help", "exit", "fullwrite", "fullread"])
-def test_shell_command_valid(command):
-    ret = is_invalid_command(command)
-    assert ret is False
-
-@pytest.mark.parametrize("command", ["love", "bug"])
-def test_shell_command_invalid_foramt(capsys, command):
-    ret = is_invalid_command(command)
-    output = capsys.readouterr()
-    assert output.out == 'INVALID COMMAND\n'
-    assert ret is True
-
-
 def test_shell_exit(mocker: MockerFixture, capsys):
     shell = Shell()
     mocker_exit = mocker.patch("sys.exit")
-    shell.exit()
+    shell.exit("exit")
     output = capsys.readouterr()
     mocker_exit.assert_called_once_with(0)
     assert output.out == "Exiting shell...\n"
@@ -37,7 +24,7 @@ def test_shell_full_read_valid(mocker: MockerFixture, capsys):
     mk_full_read = mocker.patch('shell.shell.Shell._read')
     mk_full_read.return_value = '0x00000000'
     shell = Shell()
-    shell.fullread()
+    shell.fullread("fullread")
     captured = capsys.readouterr()
     assert mk_full_read.call_count == 100
     mk_full_read.assert_has_calls([call(str(x)) for x in range(100)])
@@ -46,7 +33,7 @@ def test_shell_full_read_valid(mocker: MockerFixture, capsys):
 
 def test_shell_help(capsys):
     shell = Shell()
-    shell.help()
+    shell.help("help")
     captured = capsys.readouterr()
     assert captured.out == ('\n'
                             '        제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은\n'

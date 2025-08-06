@@ -11,8 +11,6 @@ MIN_LBA = 0
 MAX_LBA = 99
 MAX_VALUE_LENGTH = 10
 ERROR = "ERROR"
-VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread", "1_", "2_", "3_",
-                 "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
 
@@ -21,11 +19,8 @@ class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command, is_script: bool = False):
-        parts = read_command.split()
-        if len(parts) != 2:
-            raise ValueError
-        lba = self.get_lba_from_read_command(read_command)
+    def read(self, read_command:str, is_script: bool = False):
+        _, lba = read_command.split()
         if self._is_invalid_lba(lba):
             raise ValueError
         line = self._read(lba)
@@ -47,12 +42,16 @@ class Shell:
             line = file.readline().strip()
         return line
 
-    def fullread(self):
+    def fullread(self, read_command: str):
+        if len(read_command.split()) != 1:
+            raise ValueError
         print('[Full Read]')
         for lba in range(MIN_LBA, MAX_LBA + 1):
             print(f'LBA {lba:02d} : {self._read(str(lba))}')
 
-    def help(self):
+    def help(self, read_command: str):
+        if len(read_command.split()) != 1:
+            raise ValueError
         print('''
         제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은
         명령어 사용 법 :
@@ -67,7 +66,9 @@ class Shell:
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
               )
 
-    def exit(self):
+    def exit(self, read_command:str):
+        if len(read_command.split()) != 1:
+            raise ValueError
         print("Exiting shell...")
         sys.exit(0)
 
@@ -125,11 +126,11 @@ def main():
             elif command_prefix == "fullwrite":
                 shell.fullwrite(command)
             elif command_prefix == "fullread":
-                shell.fullread()
+                shell.fullread(command)
             elif command_prefix == "help":
-                shell.help()
+                shell.help(command)
             elif command_prefix == "exit":
-                shell.exit()
+                shell.exit(command)
             else:
                 shell.run_script(command)
         except ValueError:
