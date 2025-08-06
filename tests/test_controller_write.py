@@ -1,5 +1,5 @@
 import pytest
-from ssd_controller import SSDController
+from core.ssd_controller import SSDController
 import os
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

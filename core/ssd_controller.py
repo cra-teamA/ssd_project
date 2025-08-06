@@ -1,10 +1,10 @@
 import json, os
 import argparse
 
-from validator import ControllerValidator
+from core.validator import ControllerValidator
 
 ERROR = 'ERROR'
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 DEFAULT_VALUE = '0x00000000'
