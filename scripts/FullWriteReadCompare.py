@@ -28,4 +28,4 @@ class FullWriteReadCompare(BaseScript):
             return
         except Exception as e:
             print("FAIL")
-            return 
+            return
