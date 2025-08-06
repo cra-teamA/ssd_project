@@ -7,11 +7,12 @@ def test_create_ssd_controller_instance():
     assert isinstance(ssd, SSDController)
 
 
-def test_write_addr():
+def test_write_valid_addr():
     ssd = SSDController()
-    return ssd.write(0, '100') == True
+    assert ssd.write(0, '0x100') == True
 
 
-def test_write_invalid_addr():
+@pytest.mark.parametrize("invalid_addr", [100, -1, '100', None])
+def test_write_invalid_addr(invalid_addr):
     ssd = SSDController()
-    return ssd.write(100, '100') == False
+    assert ssd.write(invalid_addr, '0x100') == False

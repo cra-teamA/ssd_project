@@ -23,7 +23,9 @@ class SSDController:
             f.write(data)
 
     def write(self, addr: int, val: str) -> bool:
-        if addr > 99 :
+        if not isinstance(addr, int):
+            return False
+        if addr < 0 or addr > 99:
             return False
         return True
 
