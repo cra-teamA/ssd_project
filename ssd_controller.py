@@ -4,10 +4,13 @@ import argparse
 ERROR = 'ERROR'
 SSD_NAND_PATH = 'ssd_nand.txt'
 SSD_OUTPUT_PATH = 'ssd_output.txt'
+
+
 class SSDController:
     def __init__(self):
         ...
-    def read(self,addr:int):
+
+    def read(self, addr: int):
         if addr < 0 or addr > 99:
             self.output(ERROR)
             return
@@ -20,7 +23,10 @@ class SSDController:
             f.write(data)
 
     def write(self, addr: int, val: str) -> bool:
+        if addr > 99 :
+            return False
         return True
+
 
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
@@ -35,6 +41,7 @@ def main():
         controller.read(args.address)
     elif args.mode == "W":
         controller.write(args.address, args.value)
+
 
 if __name__ == "__main__":
     main()
