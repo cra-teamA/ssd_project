@@ -19,10 +19,11 @@ class SSDController:
             if self.validator.is_lba_bad(addr):
                 self.output(ERROR)
                 return
-
             with open(SSD_NAND_PATH, "r", encoding="utf-8") as f:
                 data = json.load(f).get(str(addr), DEFAULT_VALUE)
                 self.output(data)
+        except FileNotFoundError:
+            self.output(DEFAULT_VALUE)
         except:
             self.output(ERROR)
 
@@ -55,7 +56,8 @@ class SSDController:
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
-            
+
+
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
     parser.add_argument("mode", choices=["R", "W"], help="모드 선택: R(Read) 또는 W(Write)")
