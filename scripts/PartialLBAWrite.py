@@ -9,7 +9,8 @@ class PartialLBAWrite(BaseScript):
         lbas = [4, 0, 3, 1, 2]
         LOOP_COUNT = 30
 
-        for data in range(LOOP_COUNT):
+        for value in range(LOOP_COUNT):
+            data = f"0x{value:08x}"
             for lba in lbas:
                 self.write_lba(lba, data)
 
