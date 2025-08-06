@@ -66,14 +66,16 @@ class Shell:
         lba = read_command.split()[1]
         return lba
 
-    def write(self, read_command: str):
+    def write(self, read_command: str, is_script: bool = False):
         _, lba, value = read_command.split()
         if self._is_invalid_lba(lba):
             raise ValueError
         if self._is_invalid_value(value):
             raise ValueError
         subprocess.run(["ssd", "W", lba, f"0x{int(value, 16) :08X}"])
-        print("[Write] Done")
+
+        if not is_script:
+            print("[Write] Done")
 
     def fullwrite(self, read_command: str):
         _, value = read_command.split()

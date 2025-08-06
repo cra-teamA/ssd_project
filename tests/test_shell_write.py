@@ -14,7 +14,7 @@ def shell_and_subprocess_mocker(mocker):
 
 
 @pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
-def test_shell_write(capsys, shell_and_subprocess_mocker, value):
+def test_shell_write_cmd_success(capsys, shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
     shell.write(f"write 3 {value}")
 
@@ -23,8 +23,18 @@ def test_shell_write(capsys, shell_and_subprocess_mocker, value):
     mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
 
 
+@pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
+def test_shell_write_script_success(capsys, shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.write(f"write 3 {value}",True)
+
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    mock_run.assert_called_once_with(["ssd", "W", "3", "0x0000BBBB"])
+
+
 @pytest.mark.parametrize("lba", ["-1", "100"])
-def test_shell_write_valid_check_lba(shell_and_subprocess_mocker, lba):
+def test_shell_write_valid_check_lba_fail(shell_and_subprocess_mocker, lba):
     shell, mock_run = shell_and_subprocess_mocker
 
     with pytest.raises(ValueError):
@@ -33,7 +43,7 @@ def test_shell_write_valid_check_lba(shell_and_subprocess_mocker, lba):
 
 
 @pytest.mark.parametrize("value", ["0xAAAAABBBB", "0xAAAAFFFK", "AAAAFFF"])
-def test_shell_write_valid_check_value(shell_and_subprocess_mocker, value):
+def test_shell_write_valid_check_value_fail(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
 
     with pytest.raises(ValueError):
@@ -42,7 +52,7 @@ def test_shell_write_valid_check_value(shell_and_subprocess_mocker, value):
 
 
 @pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
-def test_shell_fullwrite(capsys, shell_and_subprocess_mocker, value):
+def test_shell_fullwrite_success(capsys, shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
 
     shell.fullwrite(f"write {value}")
@@ -56,7 +66,7 @@ def test_shell_fullwrite(capsys, shell_and_subprocess_mocker, value):
 
 
 @pytest.mark.parametrize("value", ["0xAAAAABBBB", "0xAAAAFFFK", "AAAAFFF"])
-def test_shell_fullwrite_valid_check_value(shell_and_subprocess_mocker, value):
+def test_shell_fullwrite_valid_check_value_fail(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
 
     with pytest.raises(ValueError):
