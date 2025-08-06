@@ -1,5 +1,18 @@
+# 환경 설정 파일
 .env
-.idea
-ssd_project.egg-info
-build
-__pycache__
+
+# IDE 설정
+.idea/
+
+# Python 빌드 및 캐시 파일
+__pycache__/
+*.egg-info/
+build/
+
+# 출력 및 결과 파일
+ssd_output.txt
+ssd_nand.txt
+
+# 테스트 및 쉘 폴더 내 캐시
+tests/__pycache__/
+shell/__pycache__/
