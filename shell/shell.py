@@ -109,6 +109,8 @@ class Shell:
             print("PASS")
         elif result is False:
             print("FAIL")
+        else :
+            print("INVALID COMMAND")
 
 def main():
     shell = Shell()
