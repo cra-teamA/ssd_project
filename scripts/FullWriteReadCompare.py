@@ -15,6 +15,7 @@ class FullWriteReadCompare(BaseScript):
 
                 start_lba = group * group_size
                 end_lba = start_lba + group_size
+
                 for lba in range(start_lba, end_lba):
                     self.write_lba(lba, value)
 
