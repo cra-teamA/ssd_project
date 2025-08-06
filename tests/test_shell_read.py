@@ -56,3 +56,17 @@ def test_shell_invalid_lba(mocker):
         shell.read("read 150")  # 150은 범위 벗어남
     with pytest.raises(ValueError):
         shell.read("read abc")  # 숫자 아님
+
+def test_shell_is_script(mocker, capsys):
+    shell = Shell()
+    mock_subprocess = mocker.patch("shell.shell.subprocess.run")
+    fake_output_content = "0xAAAABBBC\n"
+    mocker.patch(
+        "builtins.open",
+        mock_open(read_data=fake_output_content)
+    )
+    line = shell.read("read 3", True)
+    output = capsys.readouterr()
+
+    assert output.out == ""
+    assert line == "0xAAAABBBC"

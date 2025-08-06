@@ -1,3 +1,4 @@
+import os
 import subprocess
 import sys
 
@@ -7,13 +8,14 @@ MAX_VALUE_LENGTH = 10
 ERROR = "ERROR"
 VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread", "1_", "2_", "3_",
                  "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
-
+PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 
 class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command):
+    def read(self, read_command, is_script:bool = False):
         parts = read_command.split()
         if len(parts) != 2:
             raise ValueError
@@ -21,10 +23,11 @@ class Shell:
         if self._is_invalid_lba(lba):
             raise ValueError
         line = self._read(lba)
-        if line == ERROR:
-            print(f"[Read] {ERROR}")
-        else:
-            print(f"[Read] LBA {lba} : {line}")
+        if not is_script:
+            if line == ERROR:
+                print(f"[Read] {ERROR}")
+            else:
+                print(f"[Read] LBA {lba} : {line}")
         return line
 
     def _read(self, lba):
@@ -33,7 +36,7 @@ class Shell:
             capture_output=True,
             text=True
         )
-        output = 'ssd_output.txt'
+        output = SSD_OUTPUT_PATH
         with open(output, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
         return line
