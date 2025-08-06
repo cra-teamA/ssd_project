@@ -79,8 +79,8 @@ class Shell:
             print("INVALID COMMAND")
             return
 
-    def _is_invalid_lba(self, lba):
+    def _is_invalid_lba(self, lba: str) -> bool:
         return int(lba) < MIN_LBA or int(lba) > MAX_LBA
 
-    def _is_invalid_value(self, value):
+    def _is_invalid_value(self, value: str) -> bool:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
