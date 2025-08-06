@@ -1,5 +1,7 @@
-.env
+.venv
 .idea
 ssd_project.egg-info
 __pycache__
 build
+ssd_nand.txt
+ssd_output.txt
