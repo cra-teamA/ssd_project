@@ -26,18 +26,18 @@ class SSDController:
             self.output(ERROR)
             return False
 
+        self.update_nand_txt(addr, val)
+        return True
+
+    def update_nand_txt(self, addr, val):
         if not os.path.exists(SSD_NAND_PATH):
             with open(SSD_NAND_PATH, 'w') as f:
                 json.dump({}, f)
-
         with open(SSD_NAND_PATH, "r") as f:
             memory = json.load(f)
             memory[str(addr)] = val.lower()
-
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
-
-        return True
 
     def _temp_read_for_test(self, addr: int):
         with open(SSD_NAND_PATH, "r") as f:
