@@ -12,7 +12,7 @@ class Shell:
     def read(self, read_command):
         lba = self.get_lba_from_read_command(read_command)
         subprocess.run(
-            ["ssd", "R", lba],
+            [ "ssd", "R", lba],
             capture_output=True,
             text=True
         )
