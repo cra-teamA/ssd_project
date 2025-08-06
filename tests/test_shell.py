@@ -11,19 +11,17 @@ def shell_and_subprocess_mocker(mocker: MockerFixture):
     mock_run = mocker.patch("shell.shell.subprocess.run")
     return shell, mock_run
 
+@pytest.mark.parametrize("command", ["write", "read", "exit", "help", "exit", "fullwrite", "fullread"])
+def test_shell_command_valid(command):
+    ret = is_invalid_command(command)
+    assert ret is False
 
-def test_shell_command_valid(mocker: MockerFixture):
-    mocker.patch("builtins.input", return_value="write")
-    ret = is_invalid_command()
-    assert ret is True
-
-
-def test_shell_command_invalid_foramt(mocker: MockerFixture, capsys):
-    mocker.patch("builtins.input", return_value="hello")
-    ret = is_invalid_command()
+@pytest.mark.parametrize("command", ["love", "bug"])
+def test_shell_command_invalid_foramt(capsys, command):
+    ret = is_invalid_command(command)
     output = capsys.readouterr()
     assert output.out == 'INVALID COMMAND\n'
-    assert ret is False
+    assert ret is True
 
 
 def test_shell_exit(mocker: MockerFixture, capsys):
@@ -42,7 +40,7 @@ def test_shell_full_read_valid(mocker: MockerFixture, capsys):
     shell.fullread()
     captured = capsys.readouterr()
     assert mk_full_read.call_count == 100
-    mk_full_read.assert_has_calls([call(x) for x in range(100)])
+    mk_full_read.assert_has_calls([call(str(x)) for x in range(100)])
     assert captured.out.strip() == '[Full Read]\n' + '\n'.join([f"LBA {i:02d} : 0x00000000" for i in range(100)])
 
 
