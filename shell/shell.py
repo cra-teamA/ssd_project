@@ -4,13 +4,21 @@ MIN_LBA = 0
 MAX_LBA = 99
 MAX_VALUE_LENGTH = 10
 ERROR = "ERROR"
+VALID_COMMAND = ["write", "read", "exit", "help", "exit", "fullwrite", "fullread", "1_", "2_", "3_",
+                 "1_FullWriteAndReadCompare", "2_PartialLBAWrite", "3_WriteReadAging"]
+
 
 class Shell:
     def __init__(self):
         ...
 
     def read(self, read_command):
+        parts = read_command.split()
+        if len(parts) != 2:
+            raise ValueError
         lba = self.get_lba_from_read_command(read_command)
+        if self._is_invalid_lba(lba):
+            raise ValueError
         line = self._read(lba)
         if line == ERROR:
             print(f"[Read] {ERROR}")
@@ -48,7 +56,7 @@ class Shell:
          7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력
          8. exit: exit
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
-        )
+              )
 
     def get_lba_from_read_command(self, read_command: str) -> str:
         lba = read_command.split()[1]
@@ -84,3 +92,10 @@ class Shell:
 
     def _is_invalid_value(self, value: str) -> bool:
         return len(value) > MAX_VALUE_LENGTH or not value.upper().startswith("0X")
+
+def is_valid_command():
+    cli = input("Shell > ")
+    if not cli.startswith(tuple(VALID_COMMAND)):
+        print("INVALID COMMAND")
+        return False
+    return True
