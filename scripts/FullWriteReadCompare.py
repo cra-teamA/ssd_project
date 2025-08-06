@@ -21,9 +21,10 @@ class FullWriteReadCompare(BaseScript):
                 for lba in range(start_lba, end_lba):
                     result = self.read_lba(lba)
                     if result != value:
-                        return False
-
-            return True
+                        print("FAIL")
+                        return
+            print("PASS")
+            return
         except Exception as e:
-            print(f"Exception during write/read: {e}")
-            return False
+            print("FAIL")
+            return
