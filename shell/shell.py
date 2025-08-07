@@ -197,7 +197,7 @@ def main():
         shell_command_mode(shell)
     else:
         script_run_txt = sys.argv[1]
-        cmd = f"python {sys.argv[0]} {script_run_txt}" #항상 첫번째 text 파일만 읽어온다.
+        cmd = f"shell {script_run_txt}" #항상 첫번째 text 파일만 읽어온다.
         shell.run_script(cmd)
 
 if __name__ == "__main__":
