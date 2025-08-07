@@ -3,7 +3,7 @@ import argparse
 
 from core.validator import ControllerValidator
 from core.command import Command, command_factory, DEFAULT_VALUE, EraseCommand, WriteCommand
-from core.CommandBuffer import CommandBuffer
+from core.command_buffer import CommandBuffer
 
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -80,22 +80,22 @@ class SSDController:
             self.output(ERROR)
             return False
 
-    def buffer_optimize(self, _cache, _buf_cmds):
-        generated_commands = self._generate_commands(_cache)
-        picked_cmd = self._pick_smaller_commands(generated_commands, _buf_cmds)
-        pass
+    def buffer_optimize(self):
+        generated_commands = self._generate_commands()
+        picked_cmd = self._pick_smaller_commands(generated_commands, self.buffer.get())
+        self.buffer.replace(picked_cmd)
 
     def _pick_smaller_commands(self, generated_commands, _buf_cmds):
         if len(generated_commands) < len(_buf_cmds):
             return generated_commands
         return _buf_cmds
 
-    def _generate_commands(self, _cache):
+    def _generate_commands(self):
         optimized_cmd = []
         is_erase_duration = False
         s_addr = -1
         e_n = -1
-        for addr, val in _cache.items():
+        for addr, val in self.cache.items():
             if not val:
                 if is_erase_duration:
                     is_erase_duration = False
@@ -141,11 +141,12 @@ class SSDController:
     def execute(self, command: Command):
         if command.mode == "R":
             self.read(command.lba)
-        elif command.mode == "W":
-            self.write(command.lba, command.value)
-        elif command.mode == "E":
-            print(command.lba, command.size)
-            self.erase(command.lba, command.size)
+        elif command.mode == "W" or command.mode == "E":
+            if self.buffer.is_full():
+                self.flush()
+            self.buffer.add(command)
+            self.buffer_optimize()
+            self.buffer.syncToDirectory()
         elif command.mode == "F":
             self.flush()
 

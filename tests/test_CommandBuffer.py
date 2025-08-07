@@ -1,4 +1,4 @@
-from core.CommandBuffer import CommandBuffer
+from core.command_buffer import CommandBuffer
 
 
 buffer = CommandBuffer()
