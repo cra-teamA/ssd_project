@@ -44,13 +44,25 @@ class SSDController:
             self.output(ERROR)
             return False
 
-    def update_nand_txt(self, addr, val) -> None:
+    def erase(self, addr: int, size: int) -> bool:
+        try:
+            if self.validator.is_lba_bad(addr) or self.validator.is_size_bad(size):
+                self.output(ERROR)
+                return False
+
+            self.update_nand_txt(addr, DEFAULT_VALUE, size=size)
+            return True
+        except:
+            self.output(ERROR)
+            return False
+    def update_nand_txt(self, addr, val, size=1) -> None:
         if not os.path.exists(SSD_NAND_PATH):
             self.ssd_nand_init()
         try:
             with open(SSD_NAND_PATH, "r") as f:
                 memory = json.load(f)
-                memory[str(addr)] = val.lower()
+                for i in range(size):
+                    memory[str(addr+i)] = val.lower()
         except json.decoder.JSONDecodeError:
             self.ssd_nand_init()
         with open(SSD_NAND_PATH, "w") as f:
@@ -68,16 +80,19 @@ class SSDController:
 def main():
     parser = argparse.ArgumentParser(description="SSD Controller")
     parser.add_argument("mode", choices=["R", "W"], help="모드 선택: R(Read) 또는 W(Write)")
-    parser.add_argument("address", type=int, help="LBA 주소 (0~99)")
-    parser.add_argument("value", nargs="?", help="저장할 값 (0x로 시작하는 8자리 HEX, Write일 때만 사용)")
+    parser.add_argument("lba", type=int, help="LBA 주소 (0~99)")
+    parser.add_argument("param", nargs="?", help="write일 경우 저장할 값 (0x로 시작하는 8자리 HEX), erase일 경우 삭제할 size")
+
 
     args = parser.parse_args()
     controller = SSDController()
     # 동작 선택
     if args.mode == "R":
-        controller.read(args.address)
+        controller.read(args.lba)
     elif args.mode == "W":
-        controller.write(args.address, args.value)
+        controller.write(args.lba, args.param)
+    elif args.mode == "E":
+        controller.erase(args.lba, args.param)
 
 
 if __name__ == "__main__":
