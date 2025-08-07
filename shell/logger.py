@@ -3,7 +3,7 @@ import os
 import inspect
 import re
 
-MAX_FILE_SIZE = 1 * 1024  # 10kb
+MAX_FILE_SIZE = 10 * 1024  # 10kb
 TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 LOG_FOLDER = os.path.join(os.path.abspath(__file__).split("shell")[0], "log")
 
@@ -21,17 +21,10 @@ class Logger:
             self._init_file()
             self.initialized = True
 
-
-
     def _init_file(self):
         self.log_file = "latest.log"
-        print(LOG_FOLDER)
-
         os.makedirs(LOG_FOLDER, exist_ok=True)
         os.chdir(LOG_FOLDER)
-        if not os.path.exists(self.log_file):
-            with open(self.log_file, 'w'):
-                pass
 
     def _get_caller_info(self) -> (str, str):
         stack = inspect.stack()
@@ -48,20 +41,25 @@ class Logger:
             cls_name = type(local_vars['self']).__name__
         return cls_name, func_name
 
-    def info(self, message: str):
+    def set_log(self, message: str):
         cls_name, func_name = self._get_caller_info()
         time_stamp = datetime.datetime.now().strftime(TIME_STAMP_FORMAT)
         caller = f"{cls_name}.{func_name}"
-        log = f"[INFO][{time_stamp}] {caller:30} {message}"
+        log = f"[{time_stamp}] {caller:30} {message}"
         self._logging(log)
 
     def _logging(self, log_message: str):
         if self._check_log_file_size_max():
             self._compress_log_file()
             self._change_log_file_name()
-        print(log_message)
         with open(self.log_file, 'a', encoding='utf-8') as f:
             f.write(log_message + '\n')
+
+    def _compress_log_file(self):
+        for filename in os.listdir('.'):
+            if filename.startswith('until') and filename.endswith('.log'):
+                new_name = filename[:-4] + '.zip'
+                os.rename(filename, new_name)
 
     def _check_log_file_size_max(self) -> bool:
         if not os.path.exists(self.log_file):
@@ -74,55 +72,33 @@ class Logger:
         last_log_time = self._get_last_log_time()
         os.rename(self.log_file, f"until_{last_log_time}.log")
 
-    def _compress_log_file(self):
-        for filename in os.listdir('.'):
-            if filename.startswith('until') and filename.endswith('.log'):
-                new_name = filename[:-4] + '.zip'  # .log → .zip
-                os.rename(filename, new_name)
-
     def _get_last_log_time(self) -> str:
         with open(self.log_file, 'rb') as f:
-            f.seek(-2, os.SEEK_END)  # 파일 끝에서 시작
+            f.seek(-2, os.SEEK_END)
             while f.read(1) != b'\n':
                 f.seek(-2, os.SEEK_CUR)
             last_line = f.readline().decode()
 
-        match = re.search(r'([^]]*)?\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line)
-        dt = datetime.datetime.strptime(match.group(2), TIME_STAMP_FORMAT)
-        last_log_time = dt.strftime("%Y%m%d_%Hh_%Mm_%Ss")
+        get_last_time = re.search(r'([^]]*)?\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line).group(2)
+        last_log_time = datetime.datetime.strptime(get_last_time, TIME_STAMP_FORMAT).strftime("%Y%m%d_%Hh_%Mm_%Ss")
         return last_log_time
 
-
-class AAA:
-    def __init__(self):
-        self.num = 1
-        self.logger = Logger()
-
-    def a(self):
-        self.logger.info(f"aaa {self.num}")
-        self.num += 1
-
-
-class BBB:
+class TestClass:
     def __init__(self):
         self.num = 100
         self.logger = Logger()
 
-    def b(self):
-        self.logger.info(f"bbb {self.num}")
+    def test(self):
+        self.logger.set_log(f"loglog{self.num}")
         self.num -= 1
 
 
 def main():
-    a = AAA()
-    b = BBB()
-
-    a.a()
-    a.a()
-    b.b()
-    b.b()
-    a.a()
-    b.b()
+    import time
+    tc = TestClass()
+    for _ in range(30):
+        tc.test()
+        time.sleep(0.2)
 
 
 if __name__ == "__main__":
