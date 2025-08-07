@@ -30,7 +30,7 @@ class Shell:
         with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
         if not is_script:
-            print(f"[Read] ERROR" if line == "ERROR" else f"[Read] LBA {lba} : {line}")
+            print(f"[Read] LBA {lba} : {line}")
         return line
 
     def fullread(self, read_command: str):
