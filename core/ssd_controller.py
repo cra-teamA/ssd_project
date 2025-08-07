@@ -1,6 +1,7 @@
 import json, os
 import argparse
 
+from core.CommandBuffer import CommandBuffer
 from core.validator import ControllerValidator
 
 ERROR = 'ERROR'
@@ -13,7 +14,7 @@ DEFAULT_VALUE = '0x00000000'
 class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
-        self.buffer = None
+        self.buffer = CommandBuffer()
         self.update_cache(self.buffer)
 
     def update_cache(self, buffer):
