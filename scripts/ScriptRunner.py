@@ -15,13 +15,15 @@ class ScriptRunner:
 
     def run(self, command: str) -> bool | None:
 
-        if not (parts := command.split("_", 1)) or len(parts) != 2:
+        if not (command_split := command.split("_", 1)) or len(command_split) != 2:
             return None
 
-        script_class = self.script_mapping.get(parts[0])
-        if not script_class:
+        num, class_name = command_split[0], command_split[1]
+
+        script_class = self.script_mapping.get(num)
+        if (not script_class) or \
+                (class_name != "" and class_name != script_class.__name__):
             return None
 
         script = script_class(self.shell)
-
         return script.run()
