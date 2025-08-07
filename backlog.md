@@ -23,5 +23,7 @@
 |SC1B|Script/1_FullWriteAndReadCompare개발| feature/script_fullwritecompare |장진섭| 개발완료   |
 |SC2A|Script/2_PartialLBAWrite개발|feature/script_feature|이규홍|개발완료|
 |SC2B|Script/3_WriteReadAging개발|feature/script_feature|이규홍|개발완료|
-|SC3A|Script/4_EraseAndWriteAging개발|feature/EraseAndWriteAging|이규홍|진행중|
-|SC3B|Script/4_EraseAndWriteAging개발|feature/runner_script|이규홍|진행중|
+|SC3A|Script/4_EraseAndWriteAging개발|feature/EraseAndWriteAging|이규홍|개발완료|
+|SC3B|Script/4_EraseAndWriteAging개발|feature/runner_script|이규홍|개발완료|
+|SC3C|Script/BaseSript개발|feature/BaseSript|이규홍|개발완료|
+|SC3D|Script/Script_Runner개발|feature/Script_Runner|이규홍|개발완료|
