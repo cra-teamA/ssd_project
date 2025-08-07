@@ -1,8 +1,8 @@
 import pytest
 
+from core.command import WriteCommand, EraseCommand
 from core.ssd_controller import SSDController
 from dataclasses import dataclass
-
 
 cases = [
     {
@@ -61,6 +61,63 @@ cases = [
     },
 ]
 
+cases_cls = [
+    {
+        'buff': [
+            ('E', 0, 10),
+            ('W', 5, '0x00000001')
+        ],
+        'optimized': [
+            EraseCommand('E', 0, 5),
+            WriteCommand('W', 5, '0x00000001'),
+            EraseCommand('E', 6, 4)
+        ],
+    },
+    {
+        'buff': [
+            ('E', 0, 10),
+            ('W', 5, '0x00000001'),
+            ('W', 7, '0x00000001'),
+        ],
+        'optimized': [
+            EraseCommand('E', 0, 5),
+            WriteCommand('W', 5, '0x00000001'),
+            EraseCommand('E', 6, 1),
+            WriteCommand('W', 7, '0x00000001'),
+            EraseCommand('E', 8, 2),
+        ],
+    },
+    {
+        'buff': [
+            ('E', 0, 4),
+            ('E', 4, 5)
+        ],
+        'optimized': [
+            EraseCommand('E', 0, 9),
+        ],
+    },
+    {
+        'buff': [
+            ('W', 0, '0x0000000a'),
+            ('W', 0, '0x0000000b'),
+        ],
+        'optimized': [
+            WriteCommand('W', 0, '0x0000000b'),
+        ],
+    },
+    {
+        'buff': [
+            ('E', 0, 3),
+            ('W', 4, '0x0000000a'),
+            ('E', 0, 5),
+
+        ],
+        'optimized': [
+            EraseCommand('E', 0, 5),
+        ],
+    },
+]
+
 DEFAULT_VALUE = '0x00000000'
 캐시사이즈 = 100
 
@@ -86,15 +143,14 @@ def test_controller_buffer_optimize_method_is_exist(controller):
 
 
 @pytest.mark.parametrize("buff_cmd, optimized_cmd", [(case['buff'], case['optimized']) for case in cases])
-def test_controller_generate_commands_method(controller, buff_cmd, optimized_cmd):
-    temp_cache = make_temp_cache(buff_cmd)
-    assert controller._generate_commands(temp_cache, buff_cmd) == optimized_cmd
-
-
-@pytest.mark.parametrize("buff_cmd, optimized_cmd", [(case['buff'], case['optimized']) for case in cases])
 def test_controller_pick_smaller_commands(controller, buff_cmd, optimized_cmd):
     picked = buff_cmd
     if len(optimized_cmd) < len(buff_cmd):
         picked = optimized_cmd
-
     assert controller._pick_smaller_commands(buff_cmd, optimized_cmd) == picked
+
+
+@pytest.mark.parametrize("buff_cmd, optimized_cmd_class", [(case['buff'], case['optimized']) for case in cases_cls])
+def test_controller_generate_commands_method(controller, buff_cmd, optimized_cmd_class):
+    temp_cache = make_temp_cache(buff_cmd)
+    assert controller._generate_commands(temp_cache) == optimized_cmd_class
