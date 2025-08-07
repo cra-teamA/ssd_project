@@ -1,8 +1,7 @@
 import pytest
 
-from core.command import WriteCommand, EraseCommand
+from core.command import command_factory
 from core.ssd_controller import SSDController
-from dataclasses import dataclass
 
 DEFAULT_VALUE = '0x00000000'
 캐시사이즈 = 100
@@ -70,9 +69,9 @@ cases_cls = [
             ('W', 5, '0x00000001')
         ],
         'optimized': [
-            EraseCommand('E', 0, 5),
-            WriteCommand('W', 5, '0x00000001'),
-            EraseCommand('E', 6, 4)
+            command_factory('E', 0, 5),
+            command_factory('W', 5, '0x00000001'),
+            command_factory('E', 6, 4)
         ],
     },
     {
@@ -82,11 +81,11 @@ cases_cls = [
             ('W', 7, '0x00000001'),
         ],
         'optimized': [
-            EraseCommand('E', 0, 5),
-            WriteCommand('W', 5, '0x00000001'),
-            EraseCommand('E', 6, 1),
-            WriteCommand('W', 7, '0x00000001'),
-            EraseCommand('E', 8, 2),
+            command_factory('E', 0, 5),
+            command_factory('W', 5, '0x00000001'),
+            command_factory('E', 6, 1),
+            command_factory('W', 7, '0x00000001'),
+            command_factory('E', 8, 2),
         ],
     },
     {
@@ -95,7 +94,7 @@ cases_cls = [
             ('E', 4, 5)
         ],
         'optimized': [
-            EraseCommand('E', 0, 9),
+            command_factory('E', 0, 9),
         ],
     },
     {
@@ -104,7 +103,7 @@ cases_cls = [
             ('W', 0, '0x0000000b'),
         ],
         'optimized': [
-            WriteCommand('W', 0, '0x0000000b'),
+            command_factory('W', 0, '0x0000000b'),
         ],
     },
     {
@@ -115,7 +114,7 @@ cases_cls = [
 
         ],
         'optimized': [
-            EraseCommand('E', 0, 5),
+            command_factory('E', 0, 5),
         ],
     },
     {
@@ -126,8 +125,8 @@ cases_cls = [
 
         ],
         'optimized': [
-            EraseCommand('E', 10, 5),
-            WriteCommand('W', 20, '0x0000000a'),
+            command_factory('E', 10, 5),
+            command_factory('W', 20, '0x0000000a'),
         ],
     },
     {
@@ -139,11 +138,11 @@ cases_cls = [
             ('E', 9, 1),
         ],
         'optimized': [
-            EraseCommand('E', 1, 1),
-            EraseCommand('E', 3, 1),
-            EraseCommand('E', 5, 1),
-            EraseCommand('E', 7, 1),
-            EraseCommand('E', 9, 1),
+            command_factory('E', 1, 1),
+            command_factory('E', 3, 1),
+            command_factory('E', 5, 1),
+            command_factory('E', 7, 1),
+            command_factory('E', 9, 1),
         ],
     },
     {
@@ -155,11 +154,11 @@ cases_cls = [
             ('W', 9, '1'),
         ],
         'optimized': [
-            WriteCommand('W', 1, '1'),
-            WriteCommand('W', 3, '1'),
-            WriteCommand('W', 5, '1'),
-            WriteCommand('W', 7, '1'),
-            WriteCommand('W', 9, '1'),
+            command_factory('W', 1, '1'),
+            command_factory('W', 3, '1'),
+            command_factory('W', 5, '1'),
+            command_factory('W', 7, '1'),
+            command_factory('W', 9, '1'),
         ],
     },
     {
@@ -171,12 +170,10 @@ cases_cls = [
             ('W', 5, DEFAULT_VALUE),
         ],
         'optimized': [
-            EraseCommand('E', 1, 5),
+            command_factory('E', 1, 5),
         ],
     },
 ]
-
-
 
 
 def make_temp_cache(cmd) -> dict:
