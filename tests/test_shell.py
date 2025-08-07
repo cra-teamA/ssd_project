@@ -177,3 +177,35 @@ def test_shell_fullwrite_valid_check_value_fail(shell_and_subprocess_mocker, val
     with pytest.raises(ValueError):
         shell.fullwrite(f"write {value}")
     assert mock_run.call_count == 0
+
+@pytest.mark.parametrize("value", ["", "3.123", "3 4.1", "3.1 4", "3.123 4.123", "abc", "abc cde", "-2 3"])
+def test_shell_erase_fail(shell_and_subprocess_mocker, value, capsys):
+    shell, mock_run = shell_and_subprocess_mocker
+    with pytest.raises(ValueError):
+        shell.erase(f"erase {value}")
+    assert mock_run.call_count == 0
+
+@pytest.mark.parametrize("value", ["3 5", "3 -1", "3 -2000",])
+def test_shell_erase_success(shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.erase(f"erase {value}")
+    assert mock_run.call_count == 1
+
+@pytest.mark.parametrize("value", ["2000"])
+def test_shell_erase_success(shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.erase(f"erase 3 {value}")
+    assert mock_run.call_count == 10
+
+@pytest.mark.parametrize("value", ["", "3.123", "3 4.1", "3.1 4", "3.123 4.123", "abc", "abc cde", "-2 3", "2, -3", "-2 -2"])
+def test_shell_erase_range_fail(shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    with pytest.raises(ValueError):
+        shell.erase_range(f"erase_range {value}")
+    assert mock_run.call_count == 0
+
+@pytest.mark.parametrize("value", ["3 5", "5 3"])
+def test_shell_erase_range_success(shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.erase_range(f"erase_range {value}")
+    assert mock_run.call_count == 1

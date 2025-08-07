@@ -31,7 +31,7 @@ class Shell:
                 print(f"[Read] LBA {lba} : {line}")
         return line
 
-    def _read(self, lba):
+    def _read(self, lba:str):
         subprocess.run(
             [SSD_COMMAND, "R", lba],
             capture_output=True,
@@ -96,6 +96,54 @@ class Shell:
             subprocess.run([SSD_COMMAND, "W", str(lba), f"0x{int(value, 16) :08X}"])
         print("[FullWrite] Done")
 
+    def erase(self, read_command:str, is_script:bool=False):
+        _, lba, size = read_command.split()
+        if self._is_invalid_lba(lba):
+            raise ValueError
+        start, size = int(lba), int(size) # int 아니면 Value Error
+        # size가 음일때 start 바꿔주기
+        if size < 0:
+            new_start = max(MIN_LBA, start + size + 1)
+            new_size = min(start, abs(size))
+            start, size = new_start, new_size
+        end = min(start + size - 1, MAX_LBA)
+        size = end-start+1
+        if not is_script:
+            print(f'[erase] lba {start} | size {size}')
+        self._erase(start, size)
+
+    def erase_range(self, read_command:str, is_script:bool=False):
+        _, start_lba, end_lba = read_command.split()
+        if self._is_invalid_lba(start_lba) or self._is_invalid_lba(end_lba):
+            raise ValueError
+        start, end = sorted((int(start_lba), int(end_lba)))
+        start = max(start, MIN_LBA)
+        end = min(end, MAX_LBA)
+        size = end-start+1
+        if not is_script:
+            print(f'[erase range] lba {start} | size {size}')
+        self._erase(start, size)
+
+    def _erase(self, lba:int, size:int):
+        while True:
+            if size <= 10:
+                # print(f'[SSD] E {lba} {size}')
+                subprocess.run(
+                    [SSD_COMMAND, "E", lba, size],
+                    capture_output=True,
+                    text=True
+                )
+                break
+            else:
+                # print(f'[SSD] E {lba} {10}')
+                subprocess.run(
+                    [SSD_COMMAND, "E", lba, 10],
+                    capture_output=True,
+                    text=True
+                )
+                size -= 10
+                lba += 10
+
     def _is_invalid_lba(self, lba: str) -> bool:
         return int(lba) < MIN_LBA or int(lba) > MAX_LBA
 
@@ -131,6 +179,10 @@ def main():
                 shell.help(command)
             elif command_prefix == "exit":
                 shell.exit(command)
+            elif command_prefix == "erase":
+                shell.erase(command)
+            elif command_prefix == "erase_range":
+                shell.erase_range(command)
             else:
                 shell.run_script(command)
         except ValueError:
