@@ -2,7 +2,7 @@ import json, os
 import argparse
 
 from core.validator import ControllerValidator
-from core.command import Command, command_factory, DEFAULT_VALUE
+from core.command import Command, command_factory, DEFAULT_VALUE, EraseCommand, WriteCommand
 from core.CommandBuffer import CommandBuffer
 
 ERROR = 'ERROR'
@@ -79,6 +79,44 @@ class SSDController:
         except:
             self.output(ERROR)
             return False
+
+    def buffer_optimize(self, _cache, _buf_cmds):
+        generated_commands = self._generate_commands(_cache)
+        picked_cmd = self._pick_smaller_commands(generated_commands, _buf_cmds)
+        pass
+
+    def _pick_smaller_commands(self, generated_commands, _buf_cmds):
+        if len(generated_commands) < len(_buf_cmds):
+            return generated_commands
+        return _buf_cmds
+
+    def _generate_commands(self, _cache):
+        optimized_cmd = []
+        is_erase_duration = False
+        s_addr = -1
+        e_n = -1
+        for addr, val in _cache.items():
+            if not val:
+                if is_erase_duration:
+                    is_erase_duration = False
+                    optimized_cmd.append(EraseCommand('E', s_addr, e_n))
+                continue
+
+            if val != DEFAULT_VALUE:
+                if is_erase_duration:
+                    is_erase_duration = False
+                    optimized_cmd.append(EraseCommand('E', s_addr, e_n))
+                optimized_cmd.append(WriteCommand('W', addr, val))
+
+            else:
+                if is_erase_duration:
+                    e_n += 1
+                else:
+                    is_erase_duration = True
+                    s_addr = addr
+                    e_n = 1
+        return optimized_cmd
+
     def update_nand_txt(self, addr, val, size=1) -> None:
         if not os.path.exists(SSD_NAND_PATH):
             self.ssd_nand_init()
@@ -99,15 +137,16 @@ class SSDController:
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
-    def execute(self, command:Command):
+
+    def execute(self, command: Command):
         if command.mode == "R":
             self.read(command.lba)
         elif command.mode == "W":
             self.write(command.lba, command.value)
-        elif command.mode  == "E":
+        elif command.mode == "E":
             print(command.lba, command.size)
             self.erase(command.lba, command.size)
-        elif command.mode  == "F":
+        elif command.mode == "F":
             self.flush()
 
 
@@ -119,6 +158,7 @@ def main():
 
     controller = SSDController()
     controller.execute(command_factory(**vars(parser.parse_args())))
+
 
 if __name__ == "__main__":
     main()

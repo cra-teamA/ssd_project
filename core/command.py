@@ -19,12 +19,23 @@ class WriteCommand(Command):
         self.lba = args[1]
         self.value = args[2]
         self.size = 1
+
+    def __eq__(self, other):
+        if not isinstance(other, WriteCommand):
+            return False
+        return self.mode == other.mode and self.lba == other.lba and self.size == other.size and self.value == other.value
+
+
 class EraseCommand(Command):
     def __init__(self, *args):
         self.mode = args[0]
         self.lba = args[1]
         self.value = DEFAULT_VALUE
         self.size = int(args[2])
+    def __eq__(self, other):
+        if not isinstance(other, EraseCommand):
+            return False
+        return self.mode == other.mode and self.lba == other.lba and self.size == other.size and self.value == other.value
 
 class FlushCommand(Command):
     def __init__(self, *args):
