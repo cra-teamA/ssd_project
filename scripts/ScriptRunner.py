@@ -16,42 +16,19 @@ class ScriptRunner:
 
     def __init__(self, shell_instance):
         self.shell = shell_instance
+        self.valid_script_names = []
+        for script_idx, script_class in self.script_mapping.items():
+            self.valid_script_names.append(script_idx + '_')
+            self.valid_script_names.append(script_idx + '_' + script_class.__name__)
 
-    def parse_command(self, input_command: str):
-        command = input_command.strip()
-        if not command:
-            return {"type": "empty"}
-
-        if command.startswith("shell "):
-            filename = command[6:].strip()
-            return {"type": "shell", "filename": filename}
-
-        parts = input_command.split("_", 1)
-        if len(parts) != 2:
-            return {"type": "invalid", "reason": "Format should be 'num_ClassName'"}
-
-        num, class_name = parts
-        script_class = self.script_mapping.get(num)
-
-        if not script_class:
-            return {"type": "invalid", "reason": f"Unknown script number: {num}"}
-
-        if class_name != "" and class_name != script_class.__name__:
-            return {"type": "invalid", "reason": f"Class name mismatch: {class_name} != {script_class.__name__}"}
-
-        return {"type": "script", "num": num, "class_name": class_name, "script_class": script_class}
-
-    def run(self, input_command: str):
-        command = self.parse_command(input_command)
-
-        if command['type'] == "invalid":
-            print("INVALID COMMAND")
+    def run(self, command: str):
+        if command not in self.valid_script_names:
+            print("INVALID COMMAMD")
             return
-        elif command["type"] == "shell":
-            self.run_script_file(command['filename'])
-            return
+        elif command.startswith("shell"):
+            self.run_script_file(command.split()[1])
 
-        script_class = self.script_mapping.get(command["num"])
+        script_class = self.script_mapping.get(command.split('_')[0])
         script = script_class(self.shell)
 
         if script.run() :
@@ -68,15 +45,13 @@ class ScriptRunner:
             with open(script_path, "r", encoding="utf-8") as f:
                 for line in f:
                     command = line.strip()
-
-                    parsing_command = self.parse_command(command)
                     print(command, ' ___ ', "Run...", end='', flush=True)
 
-                    if parsing_command['type'] == "invalid":
-                        print(f"FAIL!({command} is INVALID COMMAND)")
+                    if command not in self.valid_script_names:
+                        print("INVALID COMMAMD")
                         return
 
-                    script_class = self.script_mapping.get(parsing_command["num"])
+                    script_class = self.script_mapping.get(command.split('_')[0])
                     script = script_class(self.shell)
 
                     if script.run():

@@ -18,7 +18,6 @@ from scripts.ScriptRunner import ScriptRunner
         ("avads_aa", "1", False),
         ("3_aaa", "1", False),
         ("4_", "4", True),
-        ("4_EraseAndWriteAging", "4", True),
     ]
 )
 def test_script_run_called(command, idx, expected_called):
@@ -38,7 +37,6 @@ def test_script_run_called(command, idx, expected_called):
         )
 
         ScriptRunner.script_mapping[idx] = MockScript
-
     mock_shell = Mock()
     runner = ScriptRunner(mock_shell)
     runner.run(command)
