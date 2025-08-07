@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from core.command import Command, command_factory
 
+MAX_BUFFER_SIZE = 5
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 BUFFER_DIR = os.path.join(PROJECT_ROOT, 'buffer')
 
@@ -16,7 +18,8 @@ class CommandBuffer:
         #읽은 파일들을 buffer로 동기화
         self.syncToList(filenames)
 
-
+    def is_full(self):
+        return len(self.command_buffer) >= MAX_BUFFER_SIZE
     def get(self)->list:
         return self.command_buffer
 
@@ -26,6 +29,7 @@ class CommandBuffer:
 
     def truncate(self):
         self.command_buffer = []
+        self.syncToDirectory()
 
     def print(self):
         for i, cmd in enumerate(self.command_buffer):
@@ -44,12 +48,12 @@ class CommandBuffer:
 
 
     def syncToList(self , filenames):
-        while len(filenames) < 5:
+        while len(filenames) < MAX_BUFFER_SIZE:
             filenames.append("")
-        filenames = filenames[:5]
+        filenames = filenames[:MAX_BUFFER_SIZE]
         file = filenames.copy()
 
-        for i in range(5):
+        for i in range(MAX_BUFFER_SIZE):
             file[i] = file[i].rsplit('.', 1)[0]
             if file[i] == '':
                 continue
@@ -95,4 +99,7 @@ class CommandBuffer:
             filename = os.path.join(BUFFER_DIR, filename)
             with open(filename, "w") as f:
                 pass
+
+    def replace(self, new_buffer):
+        self.command_buffer = new_buffer
 
