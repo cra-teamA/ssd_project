@@ -4,11 +4,10 @@ class FullWriteReadCompare(BaseScript):
     def __init__(self, shell_interface):
         super().__init__(shell_interface)
 
-
     def run(self):
         lba_total = 100
         group_size = 5
-        group_count = lba_total // group_size
+        group_count = 20
         try:
             for group in range(group_count):
                 value = f"0x{group:08x}"
@@ -22,7 +21,8 @@ class FullWriteReadCompare(BaseScript):
                 for lba in range(start_lba, end_lba):
                     result = self.read_lba(lba)
                     if result != value:
-                        return True
-            return False
+                        return False
+            return True
         except Exception as e:
             return False
+

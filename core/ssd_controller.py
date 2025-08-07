@@ -117,7 +117,7 @@ def main():
     parser.add_argument("param", nargs="?", help="write일 경우 저장할 값 (0x로 시작하는 8자리 HEX), erase일 경우 삭제할 size")
 
     controller = SSDController()
-    controller.execute(command_factory(parser.parse_args()))
+    controller.execute(command_factory(**vars(parser.parse_args())))
 
 if __name__ == "__main__":
     main()
