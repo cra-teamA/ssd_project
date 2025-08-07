@@ -3,6 +3,7 @@ import argparse
 
 from core.validator import ControllerValidator
 from core.command import Command, command_factory, DEFAULT_VALUE
+from core.CommandBuffer import CommandBuffer
 
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -13,9 +14,8 @@ SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
-        self.buffer = None
-        # self.update_cache(self.buffer.get())
-        self.update_cache(None)
+        self.buffer = CommandBuffer()
+        self.update_cache(self.buffer.get())
 
     def update_cache(self, buffer):
         self.cache = {}
@@ -74,7 +74,7 @@ class SSDController:
         try:
             buffer = self.buffer.get()
             for command in buffer:
-                self.run(command)
+                self.execute(command)
             self.buffer.truncate()
         except:
             self.output(ERROR)
@@ -100,13 +100,14 @@ class SSDController:
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
     def execute(self, command:Command):
-        if command.command == "R":
+        if command.mode == "R":
             self.read(command.lba)
-        elif command.command == "W":
+        elif command.mode == "W":
             self.write(command.lba, command.value)
-        elif command.command  == "E":
+        elif command.mode  == "E":
+            print(command.lba, command.size)
             self.erase(command.lba, command.size)
-        elif command.command  == "F":
+        elif command.mode  == "F":
             self.flush()
 
 
