@@ -10,9 +10,13 @@ class BaseScript(ABC):
         cmd = f"write {lba} {data}"
         self.shell.write(cmd,self.isCommandFromScript)
 
-    def read_lba(self, lba: int):
+    def read_lba(self, lba : int):
         cmd = f"read {lba}"
         return self.shell.read(cmd,self.isCommandFromScript)
+
+    def erase_lba(self, lba : int, size : int):
+        cmd = f"erase {lba} {size}"
+        self.shell.erase(cmd, self.isCommandFromScript)
 
     @abstractmethod
     def run(self):
