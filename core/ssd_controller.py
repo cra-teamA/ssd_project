@@ -62,11 +62,11 @@ class SSDController:
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
 
-    def buffer_optimize(self):
-        # TODO
-        # 캐시에 버퍼 커맨드, 커맨드 재구성해보고  버퍼커맨드와 비교해서
-        # 버퍼 커맨드에 엎어쓰 든지 하기
-        pass
+    def buffer_optimize(self, _cache, _buf_cmds):
+        generated_commands = self._generate_commands(_cache, _buf_cmds)
+        if len(generated_commands) < len(_buf_cmds):
+            return generated_commands
+        return _buf_cmds
 
     def _generate_commands(self, _cache, _buf_cmds):
         optimized_cmd = []

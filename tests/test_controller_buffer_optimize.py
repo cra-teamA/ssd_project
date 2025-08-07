@@ -1,29 +1,32 @@
 import pytest
+
 from core.ssd_controller import SSDController
+from dataclasses import dataclass
+
 
 cases = [
     {
         'buff': [
             ('E', 0, 10),
-            ('W', 5, '1')
+            ('W', 5, '0x00000001')
         ],
         'optimized': [
             ('E', 0, 5),
-            ('W', 5, '1'),
+            ('W', 5, '0x00000001'),
             ('E', 6, 4)
         ],
     },
     {
         'buff': [
             ('E', 0, 10),
-            ('W', 5, '1'),
-            ('W', 7, '1'),
+            ('W', 5, '0x00000001'),
+            ('W', 7, '0x00000001'),
         ],
         'optimized': [
             ('E', 0, 5),
-            ('W', 5, '1'),
+            ('W', 5, '0x00000001'),
             ('E', 6, 1),
-            ('W', 7, '1'),
+            ('W', 7, '0x00000001'),
             ('E', 8, 2),
         ],
     },
@@ -38,17 +41,17 @@ cases = [
     },
     {
         'buff': [
-            ('W', 0, 'a'),
-            ('W', 0, 'b'),
+            ('W', 0, '0x0000000a'),
+            ('W', 0, '0x0000000b'),
         ],
         'optimized': [
-            ('W', 0, 'b'),
+            ('W', 0, '0x0000000b'),
         ],
     },
     {
         'buff': [
             ('E', 0, 3),
-            ('W', 4, 'a'),
+            ('W', 4, '0x0000000a'),
             ('E', 0, 5),
 
         ],
@@ -83,7 +86,15 @@ def test_controller_buffer_optimize_method_is_exist(controller):
 
 
 @pytest.mark.parametrize("buff_cmd, optimized_cmd", [(case['buff'], case['optimized']) for case in cases])
-def test_controller_generate_commands_mathod(controller, buff_cmd, optimized_cmd):
+def test_controller_generate_commands_method(controller, buff_cmd, optimized_cmd):
     temp_cache = make_temp_cache(buff_cmd)
-
     assert controller._generate_commands(temp_cache, buff_cmd) == optimized_cmd
+
+
+@pytest.mark.parametrize("buff_cmd, optimized_cmd", [(case['buff'], case['optimized']) for case in cases])
+def test_controller_pick_smaller_commands(controller, buff_cmd, optimized_cmd):
+    picked = buff_cmd
+    if len(optimized_cmd) < len(buff_cmd):
+        picked = optimized_cmd
+
+    assert controller._pick_smaller_commands(buff_cmd, optimized_cmd) == picked
