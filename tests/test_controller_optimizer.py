@@ -4,6 +4,8 @@ from core.command import WriteCommand, EraseCommand
 from core.ssd_controller import SSDController
 from dataclasses import dataclass
 
+DEFAULT_VALUE = '0x00000000'
+캐시사이즈 = 100
 cases = [
     {
         'buff': [
@@ -128,10 +130,53 @@ cases_cls = [
             WriteCommand('W', 20, '0x0000000a'),
         ],
     },
+    {
+        'buff': [
+            ('E', 1, 1),
+            ('E', 3, 1),
+            ('E', 5, 1),
+            ('E', 7, 1),
+            ('E', 9, 1),
+        ],
+        'optimized': [
+            EraseCommand('E', 1, 1),
+            EraseCommand('E', 3, 1),
+            EraseCommand('E', 5, 1),
+            EraseCommand('E', 7, 1),
+            EraseCommand('E', 9, 1),
+        ],
+    },
+    {
+        'buff': [
+            ('W', 1, '1'),
+            ('W', 3, '1'),
+            ('W', 5, '1'),
+            ('W', 7, '1'),
+            ('W', 9, '1'),
+        ],
+        'optimized': [
+            WriteCommand('W', 1, '1'),
+            WriteCommand('W', 3, '1'),
+            WriteCommand('W', 5, '1'),
+            WriteCommand('W', 7, '1'),
+            WriteCommand('W', 9, '1'),
+        ],
+    },
+    {
+        'buff': [
+            ('W', 1, DEFAULT_VALUE),
+            ('W', 2, DEFAULT_VALUE),
+            ('W', 3, DEFAULT_VALUE),
+            ('W', 4, DEFAULT_VALUE),
+            ('W', 5, DEFAULT_VALUE),
+        ],
+        'optimized': [
+            EraseCommand('E', 1, 5),
+        ],
+    },
 ]
 
-DEFAULT_VALUE = '0x00000000'
-캐시사이즈 = 100
+
 
 
 def make_temp_cache(cmd) -> dict:
@@ -165,4 +210,5 @@ def test_controller_pick_smaller_commands(controller, buff_cmd, optimized_cmd):
 @pytest.mark.parametrize("buff_cmd, optimized_cmd_class", [(case['buff'], case['optimized']) for case in cases_cls])
 def test_controller_generate_commands_method(controller, buff_cmd, optimized_cmd_class):
     temp_cache = make_temp_cache(buff_cmd)
-    assert controller._generate_commands(temp_cache) == optimized_cmd_class
+    controller.cache = temp_cache
+    assert controller._generate_commands() == optimized_cmd_class
