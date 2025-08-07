@@ -58,7 +58,7 @@ cases = [
     },
 ]
 
-디폴트값 = '0x00000000'
+DEFAULT_VALUE = '0x00000000'
 캐시사이즈 = 100
 
 
@@ -67,7 +67,7 @@ def make_temp_cache(cmd) -> dict:
     for action_type, addr, c in cmd:
         if action_type == 'E':
             for i in range(addr, addr + c):
-                cache_temp[i] = 디폴트값
+                cache_temp[i] = DEFAULT_VALUE
         if action_type == 'W':
             cache_temp[addr] = c
     return cache_temp
@@ -82,9 +82,8 @@ def test_controller_buffer_optimize_method_is_exist(controller):
     assert hasattr(controller, 'buffer_optimize')
 
 
-@pytest.mark.parametrize("buffcmd, optimized_cmd", [(i['buff'], i['optimized']) for i in cases])
-def test_controller_buffer_try(controller, buffcmd, optimized_cmd):
-    temp_cache = make_temp_cache(buffcmd)
-    assert controller._generate_commands(temp_cache, buffcmd) ==optimized_cmd
+@pytest.mark.parametrize("buff_cmd, optimized_cmd", [(case['buff'], case['optimized']) for case in cases])
+def test_controller_generate_commands_mathod(controller, buff_cmd, optimized_cmd):
+    temp_cache = make_temp_cache(buff_cmd)
 
-
+    assert controller._generate_commands(temp_cache, buff_cmd) == optimized_cmd
