@@ -152,14 +152,7 @@ class Shell:
 
     def run_script(self, command):
         runner = ScriptRunner(self)
-        result = runner.run(command)
-
-        if result is True:
-            print("PASS")
-        elif result is False:
-            print("FAIL")
-        else :
-            print("INVALID COMMAND")
+        runner.run(command)
 
     def flush(self, command):
         if len(command.split()) != 1:
