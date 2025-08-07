@@ -2,7 +2,7 @@ import json, os
 import argparse
 
 from core.validator import ControllerValidator
-from core.command import Command, command_factory, DEFAULT_VALUE, EraseCommand, WriteCommand
+from core.command import Command, command_factory, DEFAULT_VALUE
 from core.command_buffer import CommandBuffer
 
 ERROR = 'ERROR'
@@ -85,36 +85,36 @@ class SSDController:
         picked_cmd = self._pick_smaller_commands(generated_commands, self.buffer.get())
         self.buffer.replace(picked_cmd)
 
-    def _pick_smaller_commands(self, generated_commands, _buf_cmds):
+    def _pick_smaller_commands(self, generated_commands: list[Command], _buf_cmds: list[Command]) -> list[Command]:
         if len(generated_commands) < len(_buf_cmds):
             return generated_commands
         return _buf_cmds
 
-    def _generate_commands(self):
+    def _generate_commands(self) -> list[Command]:
         optimized_cmd = []
         is_erase_duration = False
         s_addr = -1
-        e_n = -1
+        erase_length = -1
         for addr, val in self.cache.items():
             if not val:
                 if is_erase_duration:
                     is_erase_duration = False
-                    optimized_cmd.append(EraseCommand('E', s_addr, e_n))
+                    optimized_cmd.append(command_factory('E', s_addr, erase_length))
                 continue
 
             if val != DEFAULT_VALUE:
                 if is_erase_duration:
                     is_erase_duration = False
-                    optimized_cmd.append(EraseCommand('E', s_addr, e_n))
-                optimized_cmd.append(WriteCommand('W', addr, val))
+                    optimized_cmd.append(command_factory('E', s_addr, erase_length))
+                optimized_cmd.append(command_factory('W', addr, val))
 
             else:
                 if is_erase_duration:
-                    e_n += 1
+                    erase_length += 1
                 else:
                     is_erase_duration = True
                     s_addr = addr
-                    e_n = 1
+                    erase_length = 1
         return optimized_cmd
 
     def update_nand_txt(self, addr, val, size=1) -> None:
