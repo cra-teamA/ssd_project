@@ -11,7 +11,6 @@ from scripts.ScriptRunner import ScriptRunner
 MIN_LBA = 0
 MAX_LBA = 99
 MAX_VALUE_LENGTH = 10
-ERROR = "ERROR"
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
 
