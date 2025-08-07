@@ -1,3 +1,4 @@
+from scripts.EraseAndWriteAging import EraseAndWriteAging
 from scripts.FullWriteReadCompare import FullWriteReadCompare
 from scripts.PartialLBAWrite import PartialLBAWrite
 from scripts.WriteReadAging import WriteReadAging
@@ -8,6 +9,7 @@ class ScriptRunner:
         "1": FullWriteReadCompare,
         "2": PartialLBAWrite,
         "3": WriteReadAging,
+        "4": EraseAndWriteAging
     }
 
     def __init__(self, shell_instance):
