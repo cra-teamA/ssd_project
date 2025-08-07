@@ -20,14 +20,21 @@ def test_shell_exit(mocker: MockerFixture, capsys):
     assert output.out == "Exiting shell...\n"
 
 
-def test_shell_full_read_valid(mocker: MockerFixture, capsys):
-    mk_full_read = mocker.patch('shell.shell.Shell._read')
-    mk_full_read.return_value = '0x00000000'
+def test_shell_full_read_valid(shell_and_subprocess_mocker, capsys, mocker):
+    shell, mock_run = shell_and_subprocess_mocker
+    fake_output_content = "0x00000000\n"
+    mocker.patch(
+        "builtins.open",
+        mock_open(read_data=fake_output_content)
+    )
     shell = Shell()
     shell.fullread("fullread")
     captured = capsys.readouterr()
-    assert mk_full_read.call_count == 100
-    mk_full_read.assert_has_calls([call(str(x)) for x in range(100)])
+    assert mock_run.call_count == 100
+    expected_calls = [
+        call([SSD_COMMAND, "R", str(i)]) for i in range(100)
+    ]
+    assert mock_run.call_args_list == expected_calls
     assert captured.out.strip() == '[Full Read]\n' + '\n'.join([f"LBA {i:02d} : 0x00000000" for i in range(100)])
 
 

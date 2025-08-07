@@ -40,11 +40,6 @@ def test_shell_read_cmd_invalid_address(shell_with_single_data, value):
     shell = shell_with_single_data
     with pytest.raises(ValueError):
         shell.read(f"read {value}")
-def test_shell_full_read_valid(capsys):
-    shell = Shell()
-    shell.fullread()
-    captured = capsys.readouterr()
-    assert captured.out.strip() == '[Full Read]\n' + '\n'.join([f"LBA {i:02d} : 0x00000000" for i in range(100)])
 
 def test_shell_write_cmd_success(capsys, shell_with_single_data):
     shell = shell_with_single_data
@@ -86,13 +81,13 @@ def test_shell_write_cmd_invalid_value(shell_with_single_data, addr, value):
         shell.write(f"write {addr} {value}", True)
     # assert get_ssd_output() == ERROR
 
-def test_shell_full_write(capsys, shell_with_single_data):
+def test_shell_full_write_and_full_read(capsys, shell_with_single_data):
     shell = Shell()
     value = '0x0000BBBB'.lower()
-    shell.fullwrite(f"write {value}")
+    shell.fullwrite(f"fullwrite {value}")
     captured = capsys.readouterr()
     assert captured.out == "[FullWrite] Done\n"
 
-    shell.fullread()
+    shell.fullread(f"fullread")
     captured = capsys.readouterr()
     assert captured.out.strip() == '[Full Read]\n' + '\n'.join([f"LBA {i:02d} : {value}" for i in range(100)])
