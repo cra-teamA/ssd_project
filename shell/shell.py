@@ -1,17 +1,16 @@
 import os
 import subprocess
 import sys
-
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from logger import Logger
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 from scripts.ScriptRunner import ScriptRunner
-from logger import Logger
 
 MIN_LBA = 0
 MAX_LBA = 99
 MAX_VALUE_LENGTH = 10
-ERROR = "ERROR"
 SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
 
@@ -26,23 +25,11 @@ class Shell:
         if self._is_invalid_lba(lba):
             self.logger.set_log("invalid_lba")
             raise ValueError
-        line = self._read(lba) 
-       
-        if line == ERROR:
-            result = f"[Read] {ERROR}"   
-        else:
-            result = f"[Read] LBA {lba} : {line}"
-           
-        if not is_script:
-            print(result)
-        self.logger.set_log(result)
-        return line
-
-    def _read(self, lba: str):
-        subprocess.run([SSD_COMMAND, "R", lba])
-        output = SSD_OUTPUT_PATH
-        with open(output, 'r', encoding='utf-8') as file:
+        self.run_ssd_command("R", lba)
+        with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
+        if not is_script:
+            print(f"[Read] LBA {lba} : {line}")
         return line
 
     def fullread(self, read_command: str):
@@ -52,7 +39,10 @@ class Shell:
             raise ValueError
         print('[Full Read]')
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            result = f'LBA {lba:02d} : {self._read(str(lba))}'
+            self.run_ssd_command("R", lba)
+            with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as f:
+                line = f.readline().strip()
+            result = f'LBA {lba:02d} : {line}'
             print(result)
             self.logger.set_log(result)
 
@@ -87,10 +77,6 @@ class Shell:
         print("Exiting shell...")
         sys.exit(0)
 
-    def get_lba_from_read_command(self, read_command: str) -> str:
-        lba = read_command.split()[1]
-        return lba
-
     def write(self, read_command: str, is_script: bool = False):
         self.logger.set_log(f"[Write] get {read_command}")
         _, lba, value = read_command.split()
@@ -100,8 +86,7 @@ class Shell:
         if self._is_invalid_value(value):
             self.logger.set_log(f"invalid_value")
             raise ValueError
-        subprocess.run([SSD_COMMAND, "W", lba, f"0x{int(value, 16) :08X}"])
-
+        self.run_ssd_command("W", lba, f"0x{int(value, 16) :08X}")
         result = "[Write] Done"
         if not is_script:
             print(result)
@@ -115,7 +100,7 @@ class Shell:
             self.logger.set_log(f"invalid_value")
             raise ValueError
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            subprocess.run([SSD_COMMAND, "W", str(lba), f"0x{int(value, 16) :08X}"])
+            self.run_ssd_command("W", lba, f"0x{int(value, 16) :08X}")
         result = "[FullWrite] Done"
         print(result)
         self.logger.set_log(result)
@@ -156,15 +141,20 @@ class Shell:
         self.logger.set_log(result)
         self._erase(start, size)
 
-    def _erase(self, lba: int, size: int):
-        while True:
-            if size <= MAX_VALUE_LENGTH:
-                subprocess.run([SSD_COMMAND, "E", lba, size])
-                break
-            else:
-                subprocess.run([SSD_COMMAND, "E", lba, MAX_VALUE_LENGTH])
-                size -= MAX_VALUE_LENGTH
-                lba += MAX_VALUE_LENGTH
+    def _erase(self, lba: int, size: int, label: str = None):
+        if label:
+            print(f"{label} lba {lba} | size {size}")
+        while size > 0:
+            chunk = min(size, MAX_VALUE_LENGTH)
+            self.run_ssd_command("E", lba, chunk)
+            lba += chunk
+            size -= chunk
+
+    def flush(self, command):
+        if len(command.split()) != 1:
+            raise ValueError
+        else:
+            self.run_ssd_command("F")
 
     def _is_invalid_lba(self, lba: str) -> bool:
         return int(lba) < MIN_LBA or int(lba) > MAX_LBA
@@ -176,42 +166,30 @@ class Shell:
         runner = ScriptRunner(self)
         runner.run(command)
 
-    def flush(self, command):
-        self.logger.set_log(f"[Flush] get {command}")
-        if len(command.split()) != 1:
-            self.logger.set_log(f"[Erase] get cmd argument is not valid")
-            raise ValueError
-        else:
-            subprocess.run([SSD_COMMAND, "F"])
-        self.logger.set_log("[Flush] Done.")
+    def run_ssd_command(self,*args):
+        subprocess.run([SSD_COMMAND, *map(str, args)])
 
 
 def shell_command_mode(shell: Shell):
-    logger = Logger()
+    COMMAND_MAP = {
+        "read": shell.read,
+        "write": shell.write,
+        "fullread": shell.fullread,
+        "fullwrite": shell.fullwrite,
+        "erase": shell.erase,
+        "erase_range": shell.erase_range,
+        "flush": shell.flush,
+        "help": shell.help,
+        "exit": shell.exit,
+    }
     while True:
-        command = input("Shell > ")
+        command = input("Shell > ").strip()
+        if not command:
+            continue
+        cmd_name = command.split()[0]
+        handler = COMMAND_MAP.get(cmd_name, shell.run_script)
         try:
-            command_prefix = command.split()[0]
-            if command_prefix == "write":
-                shell.write(command)
-            elif command_prefix == "read":
-                shell.read(command)
-            elif command_prefix == "fullwrite":
-                shell.fullwrite(command)
-            elif command_prefix == "fullread":
-                shell.fullread(command)
-            elif command_prefix == "help":
-                shell.help(command)
-            elif command_prefix == "exit":
-                shell.exit(command)
-            elif command_prefix == "erase":
-                shell.erase(command)
-            elif command_prefix == "erase_range":
-                shell.erase_range(command)
-            elif command_prefix == "flush":
-                shell.flush(command)
-            else:
-                shell.run_script(command)
+            handler(command)
         except ValueError:
             print("INVALID COMMAND")
 
@@ -221,9 +199,7 @@ def main():
     if len(sys.argv) == 1:
         shell_command_mode(shell)
     else:
-        script_run_txt = sys.argv[1]
-        cmd = f"shell {script_run_txt}"  # 항상 첫번째 text 파일만 읽어온다.
-        shell.run_script(cmd)
+        shell.run_script(f"shell {sys.argv[1]}")
 
 
 if __name__ == "__main__":
