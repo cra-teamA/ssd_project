@@ -161,6 +161,12 @@ class Shell:
         else :
             print("INVALID COMMAND")
 
+    def flush(self, command):
+        if len(command.split()) != 1:
+            raise ValueError
+        else:
+            subprocess.run([SSD_COMMAND, "F"])
+
 def shell_command_mode(shell:Shell):
     while (1):
         command = input("Shell > ")
@@ -182,6 +188,8 @@ def shell_command_mode(shell:Shell):
                 shell.erase(command)
             elif command_prefix == "erase_range":
                 shell.erase_range(command)
+            elif command_prefix == "flush":
+                shell.flush(command)
             else:
                 shell.run_script(command)
         except ValueError:
