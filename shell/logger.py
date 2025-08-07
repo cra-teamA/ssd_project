@@ -7,6 +7,7 @@ MAX_FILE_SIZE = 10 * 1024  # 10kb
 TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 LOG_FOLDER = os.path.join(os.path.abspath(__file__).split("shell")[0], "log")
 
+
 class Logger:
     _instance = None
 
@@ -40,6 +41,11 @@ class Logger:
         if 'self' in local_vars:
             cls_name = type(local_vars['self']).__name__
         return cls_name, func_name
+
+    def set_log_with_print(self, message: str, is_block: bool = False):
+        self.set_log(message)
+        if not is_block:
+            print(message)
 
     def set_log(self, message: str):
         cls_name, func_name = self._get_caller_info()
@@ -82,6 +88,7 @@ class Logger:
         get_last_time = re.search(r'([^]]*)?\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line).group(2)
         last_log_time = datetime.datetime.strptime(get_last_time, TIME_STAMP_FORMAT).strftime("%Y%m%d_%Hh_%Mm_%Ss")
         return last_log_time
+
 
 class TestClass:
     def __init__(self):
