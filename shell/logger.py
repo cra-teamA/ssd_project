@@ -5,7 +5,7 @@ import re
 
 MAX_FILE_SIZE = 1 * 1024  # 10kb
 TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
-
+LOG_FOLDER = os.path.join(os.path.abspath(__file__).split("shell")[0], "log")
 
 class Logger:
     _instance = None
@@ -21,9 +21,14 @@ class Logger:
             self._init_file()
             self.initialized = True
 
+
+
     def _init_file(self):
         self.log_file = "latest.log"
+        print(LOG_FOLDER)
 
+        os.makedirs(LOG_FOLDER, exist_ok=True)
+        os.chdir(LOG_FOLDER)
         if not os.path.exists(self.log_file):
             with open(self.log_file, 'w'):
                 pass
@@ -52,8 +57,8 @@ class Logger:
 
     def _logging(self, log_message: str):
         if self._check_log_file_size_max():
-            self._change_log_file_name()
             self._compress_log_file()
+            self._change_log_file_name()
         print(log_message)
         with open(self.log_file, 'a', encoding='utf-8') as f:
             f.write(log_message + '\n')
