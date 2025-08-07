@@ -2,9 +2,10 @@
 import datetime
 import os
 import inspect
+import re
 
-MAX_FILE_SIZE = 10  #kb
-TIME_STAMP_FORMAT = "[%Y-%m-%d %H:%M:%S]"
+MAX_FILE_SIZE = 10 * 1024 #10kb
+TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 class Logger:
     _instance = None
@@ -45,7 +46,6 @@ class Logger:
         filename = frame_info.filename
         lineno = frame_info.lineno
 
-        # 클래스 이름을 알아내려면, frame의 locals에서 self를 찾아서 클래스명을 가져올 수 있음
         cls_name = None
         local_vars = frame.frame.f_locals
         if 'self' in local_vars:
@@ -58,21 +58,45 @@ class Logger:
         cls_name, func_name, _, _ = self._get_caller_info()
         time_stamp = datetime.datetime.now().strftime(TIME_STAMP_FORMAT)
         caller = f"{cls_name}.{func_name}"
-        log = f"[INFO]{time_stamp} {caller:30} {message}"
+        log = f"[INFO][{time_stamp}] {caller:30} {message}"
         self._logging(log)
         
 
     def _logging(self, log_message: str):
-        # 로그파일 크기 확인
-            # 이름 변경
+        if self._check_log_file_size_max():
+            self._change_log_file_name()
         print(log_message)
         with open(self.log_file, 'a', encoding='utf-8') as f:
             f.write(log_message + '\n')
 
+    def _check_log_file_size_max(self):
+        if not os.path.exists(self.log_file):
+            return False
+        if os.path.getsize(self.log_file)> MAX_FILE_SIZE:
+            return True
+        return False
+    
+    def _change_log_file_name(self):
+        with open(self.log_file, 'rb') as f:
+            f.seek(-2, os.SEEK_END)  # 파일 끝에서 시작
+            while f.read(1) != b'\n':
+                f.seek(-2, os.SEEK_CUR)
+            last_line = f.readline().decode()
+        
+        match = re.search(r'\[(INFO|DEBUG|ERROR)?\]?\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\]', last_line)
+        if not match:
+            print("No valid timestamp found in last line.")
+            return
+        
+        dt = datetime.datetime.strptime(match.group(2),TIME_STAMP_FORMAT)
+        last_log_time = dt.strftime("%Y%m%d_%Hh_%Mm_%Ss")
+        new_name = f"until_{last_log_time}.log"
+        os.rename(self.log_file, new_name)
+
+
 
 
 class AAA:
-
     def __init__(self):
         self.num = 1
         self.logger = Logger()
@@ -83,7 +107,6 @@ class AAA:
 
 
 class BBB:
-
     def __init__(self):
         self.num = 100
         self.logger = Logger()
