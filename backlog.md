@@ -3,8 +3,8 @@
 |C2A|SSDController/write개발| feature/controller_write |최준식| 개발완료    |
 |C2A|SSDController,Shell연동Test| integration/shell_and_controller |최준식,박성일| 개발완료    |
 |C1A|SSDController/read개발| feature/controller_read |박성일| 개발완료    |
-|C3A|SSDController/erase개발|feature/erase|박성일|진행중|
-|C3B|SSDController/cache개발|feature/cache|박성일|대기중|
+|C3A|SSDController/erase개발|feature/erase|박성일|개발완료|
+|C3B|SSDController/cache개발|feature/cache|박성일|진행중|
 |C4A|SSDController/buffer개발|feature/buffer|장진섭|진행중|
 |C4B|SSDController/flush개발|feature/flush|장진섭|대기중|
 |C5A|SSDController/optimizer개발|feature/optimizer|최준식|진행중|
