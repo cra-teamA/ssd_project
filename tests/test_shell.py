@@ -209,3 +209,15 @@ def test_shell_erase_range_success(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
     shell.erase_range(f"erase_range {value}")
     assert mock_run.call_count == 1
+
+@pytest.mark.parametrize("value", ["a", "1", "1.1"])
+def test_shell_flush_fail(shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    with pytest.raises(ValueError):
+        shell.flush(f"flush {value}")
+    assert mock_run.call_count == 0
+
+def test_shell_flush_success(shell_and_subprocess_mocker):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.flush(f"flush")
+    assert mock_run.call_count == 1
