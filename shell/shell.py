@@ -19,7 +19,7 @@ class Shell:
     def __init__(self):
         ...
 
-    def read(self, read_command:str, is_script: bool = False):
+    def read(self, read_command: str, is_script: bool = False):
         _, lba = read_command.split()
         if self._is_invalid_lba(lba):
             raise ValueError
@@ -31,12 +31,8 @@ class Shell:
                 print(f"[Read] LBA {lba} : {line}")
         return line
 
-    def _read(self, lba:str):
-        subprocess.run(
-            [SSD_COMMAND, "R", lba],
-            capture_output=True,
-            text=True
-        )
+    def _read(self, lba: str):
+        subprocess.run([SSD_COMMAND, "R", lba])
         output = SSD_OUTPUT_PATH
         with open(output, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
@@ -62,11 +58,16 @@ class Shell:
          5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력
          6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력
          7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력
-         8. exit: exit
+         8. 4_EraseAndWriteAging: 4_ 혹은 4_EraseAndWriteAging 입력
+         9. help: help
+         10. exit: exit
+         11. flush: flush
+         12. erase: erase [LBA] [SIZE]
+         13. erase_range: erase_range [START_LBA] [END_LBA]
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
               )
 
-    def exit(self, read_command:str):
+    def exit(self, read_command: str):
         if len(read_command.split()) != 1:
             raise ValueError
         print("Exiting shell...")
@@ -96,53 +97,43 @@ class Shell:
             subprocess.run([SSD_COMMAND, "W", str(lba), f"0x{int(value, 16) :08X}"])
         print("[FullWrite] Done")
 
-    def erase(self, read_command:str, is_script:bool=False):
+    def erase(self, read_command: str, is_script: bool = False):
         _, lba, size = read_command.split()
         if self._is_invalid_lba(lba):
             raise ValueError
-        start, size = int(lba), int(size) # int 아니면 Value Error
+        start, size = int(lba), int(size)  # int 아니면 Value Error
         # size가 음일때 start 바꿔주기
         if size < 0:
             new_start = max(MIN_LBA, start + size + 1)
             new_size = min(start, abs(size))
             start, size = new_start, new_size
         end = min(start + size - 1, MAX_LBA)
-        size = end-start+1
+        size = end - start + 1
         if not is_script:
             print(f'[erase] lba {start} | size {size}')
         self._erase(start, size)
 
-    def erase_range(self, read_command:str, is_script:bool=False):
+    def erase_range(self, read_command: str, is_script: bool = False):
         _, start_lba, end_lba = read_command.split()
         if self._is_invalid_lba(start_lba) or self._is_invalid_lba(end_lba):
             raise ValueError
         start, end = sorted((int(start_lba), int(end_lba)))
         start = max(start, MIN_LBA)
         end = min(end, MAX_LBA)
-        size = end-start+1
+        size = end - start + 1
         if not is_script:
             print(f'[erase range] lba {start} | size {size}')
         self._erase(start, size)
 
-    def _erase(self, lba:int, size:int):
+    def _erase(self, lba: int, size: int):
         while True:
-            if size <= 10:
-                # print(f'[SSD] E {lba} {size}')
-                subprocess.run(
-                    [SSD_COMMAND, "E", lba, size],
-                    capture_output=True,
-                    text=True
-                )
+            if size <= MAX_VALUE_LENGTH:
+                subprocess.run([SSD_COMMAND, "E", lba, size])
                 break
             else:
-                # print(f'[SSD] E {lba} {10}')
-                subprocess.run(
-                    [SSD_COMMAND, "E", lba, 10],
-                    capture_output=True,
-                    text=True
-                )
-                size -= 10
-                lba += 10
+                subprocess.run([SSD_COMMAND, "E", lba, MAX_VALUE_LENGTH])
+                size -= MAX_VALUE_LENGTH
+                lba += MAX_VALUE_LENGTH
 
     def _is_invalid_lba(self, lba: str) -> bool:
         return int(lba) < MIN_LBA or int(lba) > MAX_LBA
@@ -160,8 +151,9 @@ class Shell:
         else:
             subprocess.run([SSD_COMMAND, "F"])
 
-def shell_command_mode(shell:Shell):
-    while (1):
+
+def shell_command_mode(shell: Shell):
+    while True:
         command = input("Shell > ")
         try:
             command_prefix = command.split()[0]
@@ -188,14 +180,16 @@ def shell_command_mode(shell:Shell):
         except ValueError:
             print("INVALID COMMAND")
 
+
 def main():
     shell = Shell()
     if len(sys.argv) == 1:
         shell_command_mode(shell)
     else:
         script_run_txt = sys.argv[1]
-        cmd = f"python {sys.argv[0]} {script_run_txt}" #항상 첫번째 text 파일만 읽어온다.
+        cmd = f"shell {script_run_txt}"  # 항상 첫번째 text 파일만 읽어온다.
         shell.run_script(cmd)
+
 
 if __name__ == "__main__":
     main()
