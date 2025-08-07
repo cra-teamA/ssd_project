@@ -126,8 +126,7 @@ class Shell:
 
     def _erase(self, lba:int, size:int):
         while True:
-            if size <= 10:
-                # print(f'[SSD] E {lba} {size}')
+            if size <= MAX_VALUE_LENGTH:
                 subprocess.run(
                     [SSD_COMMAND, "E", lba, size],
                     capture_output=True,
@@ -135,14 +134,13 @@ class Shell:
                 )
                 break
             else:
-                # print(f'[SSD] E {lba} {10}')
                 subprocess.run(
-                    [SSD_COMMAND, "E", lba, 10],
+                    [SSD_COMMAND, "E", lba, MAX_VALUE_LENGTH],
                     capture_output=True,
                     text=True
                 )
-                size -= 10
-                lba += 10
+                size -= MAX_VALUE_LENGTH
+                lba += MAX_VALUE_LENGTH
 
     def _is_invalid_lba(self, lba: str) -> bool:
         return int(lba) < MIN_LBA or int(lba) > MAX_LBA

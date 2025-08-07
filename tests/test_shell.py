@@ -192,7 +192,7 @@ def test_shell_erase_success(shell_and_subprocess_mocker, value):
     assert mock_run.call_count == 1
 
 @pytest.mark.parametrize("value", ["2000"])
-def test_shell_erase_success(shell_and_subprocess_mocker, value):
+def test_shell_erase_loop_success(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
     shell.erase(f"erase 3 {value}")
     assert mock_run.call_count == 10
