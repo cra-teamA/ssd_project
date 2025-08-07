@@ -13,9 +13,11 @@ DEFAULT_VALUE = '0x00000000'
 class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
+
     def ssd_nand_init(self):
         with open(SSD_NAND_PATH, 'w') as f:
             json.dump({}, f)
+
     def read(self, addr: int) -> None:
         try:
             if self.validator.is_lba_bad(addr):
@@ -56,10 +58,42 @@ class SSDController:
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
 
-
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:
             f.write(data)
+
+    def buffer_optimize(self, _cache, _buf_cmds):
+        # TODO
+        # 캐시에 버퍼 커맨드, 커맨드 재구성해보고  버퍼커맨드와 비교해서
+        # 버퍼 커맨드에 엎어쓰 든지 하기
+        optimized_cmd = []
+        is_erase_duration = False
+        s_addr = -1
+        e_n = -1
+        디폴트값 = '0x00000000'
+        캐시사이즈 = 100
+        for addr, val in _cache.items():
+            if not val:
+                if is_erase_duration:
+                    is_erase_duration = False
+                    optimized_cmd.append(('E', s_addr, e_n))
+                continue
+
+            if val != 디폴트값:
+                if is_erase_duration:
+                    is_erase_duration = False
+                    optimized_cmd.append(('E', s_addr, e_n))
+
+                optimized_cmd.append(('W', addr, val))
+
+            if val == 디폴트값:
+                if not is_erase_duration:
+                    is_erase_duration = True
+                    s_addr = addr
+                    e_n = 1
+                elif is_erase_duration:
+                    e_n += 1
+        return optimized_cmd
 
 
 def main():

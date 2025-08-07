@@ -85,7 +85,6 @@ def test_controller_buffer_optimize_method_is_exist(controller):
 @pytest.mark.parametrize("buffcmd, optimized_cmd", [(i['buff'], i['optimized']) for i in cases])
 def test_controller_buffer_try(controller, buffcmd, optimized_cmd):
     temp_cache = make_temp_cache(buffcmd)
-    controller.buffer_optimize(temp_cache, buffcmd)
-    assert controller.buffer_optimize(temp_cache, buffcmd) ==optimized_cmd
+    assert controller._generate_commands(temp_cache, buffcmd) ==optimized_cmd
 
 
