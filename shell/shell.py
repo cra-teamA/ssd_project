@@ -161,8 +161,7 @@ class Shell:
         else :
             print("INVALID COMMAND")
 
-def main():
-    shell = Shell()
+def shell_command_mode(shell:Shell):
     while (1):
         command = input("Shell > ")
         try:
@@ -187,6 +186,15 @@ def main():
                 shell.run_script(command)
         except ValueError:
             print("INVALID COMMAND")
+
+def main():
+    shell = Shell()
+    if len(sys.argv) == 1:
+        shell_command_mode(shell)
+    else:
+        script_run_txt = sys.argv[1]
+        cmd = f"python {sys.argv[0]} {script_run_txt}" #항상 첫번째 text 파일만 읽어온다.
+        shell.run_script(cmd)
 
 if __name__ == "__main__":
     main()
