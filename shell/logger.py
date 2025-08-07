@@ -3,7 +3,7 @@ import os
 import inspect
 import re
 
-MAX_FILE_SIZE = 10 * 1024  # 10kb
+MAX_FILE_SIZE = 1 * 1024  # 10kb
 TIME_STAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
@@ -53,6 +53,7 @@ class Logger:
     def _logging(self, log_message: str):
         if self._check_log_file_size_max():
             self._change_log_file_name()
+            self._compress_log_file()
         print(log_message)
         with open(self.log_file, 'a', encoding='utf-8') as f:
             f.write(log_message + '\n')
@@ -67,6 +68,12 @@ class Logger:
     def _change_log_file_name(self):
         last_log_time = self._get_last_log_time()
         os.rename(self.log_file, f"until_{last_log_time}.log")
+
+    def _compress_log_file(self):
+        for filename in os.listdir('.'):
+            if filename.startswith('until') and filename.endswith('.log'):
+                new_name = filename[:-4] + '.zip'  # .log → .zip
+                os.rename(filename, new_name)
 
     def _get_last_log_time(self) -> str:
         with open(self.log_file, 'rb') as f:
