@@ -92,9 +92,6 @@ class SSDController:
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
 
-    def check_output_msg(self):
-        with open(SSD_OUTPUT_PATH, 'r') as f:
-            return f.read()
 
     def output(self, data):
         with open(SSD_OUTPUT_PATH, "w", encoding="utf-8") as f:

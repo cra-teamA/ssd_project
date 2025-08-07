@@ -26,7 +26,6 @@ def test_run_script_pass(mocker, shell):
         run_mock.assert_called_once()
         print_mock.assert_called_with("PASS")
 
-
 def test_run_script_fail(mocker, shell):
     # run()이 False 반환하는 경우 테스트
     run_mock = mocker.patch.object(FullWriteReadCompare, "run", return_value=False)
