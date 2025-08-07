@@ -1,8 +1,10 @@
 import os
 import subprocess
 import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from logger import Logger
+
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
@@ -28,8 +30,7 @@ class Shell:
         self.run_ssd_command("R", lba)
         with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
-        if not is_script:
-            print(f"[Read] LBA {lba} : {line}")
+        self.logger.set_log_with_print(f"[Read] LBA {lba} : {line}", is_script)
         return line
 
     def fullread(self, read_command: str):
@@ -37,14 +38,12 @@ class Shell:
         if len(read_command.split()) != 1:
             self.logger.set_log(f"[Full Read] cmd argument is not valid")
             raise ValueError
-        print('[Full Read]')
+        self.logger.set_log_with_print('[Full Read]')
         for lba in range(MIN_LBA, MAX_LBA + 1):
             self.run_ssd_command("R", lba)
             with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as f:
                 line = f.readline().strip()
-            result = f'LBA {lba:02d} : {line}'
-            print(result)
-            self.logger.set_log(result)
+            self.logger.set_log_with_print(f'LBA {lba:02d} : {line}')
 
     def help(self, read_command: str):
         self.logger.set_log(f"[Help] get {read_command}")
@@ -74,7 +73,7 @@ class Shell:
         self.logger.set_log(f"[Exit] get {read_command}")
         if len(read_command.split()) != 1:
             raise ValueError
-        print("Exiting shell...")
+        self.logger.set_log_with_print("Exiting shell...")
         sys.exit(0)
 
     def write(self, read_command: str, is_script: bool = False):
@@ -87,10 +86,7 @@ class Shell:
             self.logger.set_log(f"invalid_value")
             raise ValueError
         self.run_ssd_command("W", lba, f"0x{int(value, 16) :08X}")
-        result = "[Write] Done"
-        if not is_script:
-            print(result)
-        self.logger.set_log(result)
+        self.logger.set_log_with_print("[Write] Done", is_script)
 
     def fullwrite(self, read_command: str):
         self.logger.set_log(f"[Full write] get {read_command}")
@@ -101,9 +97,7 @@ class Shell:
             raise ValueError
         for lba in range(MIN_LBA, MAX_LBA + 1):
             self.run_ssd_command("W", lba, f"0x{int(value, 16) :08X}")
-        result = "[FullWrite] Done"
-        print(result)
-        self.logger.set_log(result)
+        self.logger.set_log_with_print("[FullWrite] Done")
 
     def erase(self, read_command: str, is_script: bool = False):
         self.logger.set_log(f"[Erase] get {read_command}")
@@ -119,10 +113,7 @@ class Shell:
             start, size = new_start, new_size
         end = min(start + size - 1, MAX_LBA)
         size = end - start + 1
-        result = f'[erase] lba {start} | size {size}'
-        if not is_script:
-            print(result)
-        self.logger.set_log("result")
+        self.logger.set_log_with_print(f'[erase] lba {start} | size {size}', is_script)
         self._erase(start, size)
 
     def erase_range(self, read_command: str, is_script: bool = False):
@@ -135,10 +126,7 @@ class Shell:
         start = max(start, MIN_LBA)
         end = min(end, MAX_LBA)
         size = end - start + 1
-        result = f'[erase range] lba {start} | size {size}'
-        if not is_script:
-            print(result)
-        self.logger.set_log(result)
+        self.logger.set_log_with_print(f'[erase range] lba {start} | size {size}', is_script)
         self._erase(start, size)
 
     def _erase(self, lba: int, size: int, label: str = None):
@@ -166,7 +154,7 @@ class Shell:
         runner = ScriptRunner(self)
         runner.run(command)
 
-    def run_ssd_command(self,*args):
+    def run_ssd_command(self, *args):
         subprocess.run([SSD_COMMAND, *map(str, args)])
 
 
