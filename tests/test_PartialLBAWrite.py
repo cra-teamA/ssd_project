@@ -15,7 +15,7 @@ def test_partial_lba_write_passes(mocker):
 
     def fake_write(cmd, isCommandFromScript):
         _, lba, data = cmd.split()
-        fake_memory[lba] = int(data)
+        fake_memory[lba] = data
 
     def fake_read(cmd, isCommandFromScript):
         _, lba = cmd.split()
