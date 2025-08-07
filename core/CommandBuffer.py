@@ -1,21 +1,15 @@
 import os
 from dataclasses import dataclass
+from core.command import Command, command_factory, DEFAULT_VALUE, WriteCommand, EraseCommand
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 BUFFER_DIR = os.path.join(PROJECT_ROOT, 'buffer')
-
-@dataclass
-class Command:
-    command: str
-    lba: int
-    size: int
-    value: str = None  # 기본값 None
 
 class CommandBuffer:
     command_buffer: list[Command]
 
     def __init__(self):
-        self.command_buffer = [Command(None,None,None,None) for _ in range(6)]
+        self.command_buffer = []
 
         #buffer 디렉토리내 파일 읽기
         filenames = self.readDirectory()
