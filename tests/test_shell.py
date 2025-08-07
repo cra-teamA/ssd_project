@@ -36,17 +36,33 @@ def test_shell_help(capsys):
     shell.help("help")
     captured = capsys.readouterr()
     assert captured.out == ('\n'
-                            '        제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은\n'
-                            '        명령어 사용 법 :\n'
-                            '         1. read: read [LBA]\n'
-                            '         2. write: write [LBA] [VALUE]\n'
-                            '         3. fullwrite: fullwrite [VALUE]\n'
-                            '         4. fullread: fullread\n'
-                            '         5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력\n'
-                            '         6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력\n'
-                            '         7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력\n'
-                            '         8. exit: exit\n'
-                            '        그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.\n')
+ '        제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은\n'
+ '        명령어 사용 법 :\n'
+ '         1. read: read [LBA]\n'
+ '         2. write: write [LBA] [VALUE]\n'
+ '         3. fullwrite: fullwrite [VALUE]\n'
+ '         4. fullread: fullread\n'
+ '         5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력\n'
+ '         6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력\n'
+ '         7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력\n'
+ '         8. 4_EraseAndWriteAging: 4_ 혹은 4_EraseAndWriteAging 입력\n'
+ '         9. help: help\n'
+ '         10. exit: exit\n'
+ '         11. flush: flush\n'
+ '         12. erase: erase [LBA] [SIZE]\n'
+ '         13. erase_range: erase_range [START_LBA] [END_LBA]\n'
+ '        그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.\n') != ('\n'
+ '        제작자: [Team All Clear] 장진섭 팀장, 박성일, 이규홍, 최준식, 임소현, 이휘은\n'
+ '        명령어 사용 법 :\n'
+ '         1. read: read [LBA]\n'
+ '         2. write: write [LBA] [VALUE]\n'
+ '         3. fullwrite: fullwrite [VALUE]\n'
+ '         4. fullread: fullread\n'
+ '         5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력\n'
+ '         6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력\n'
+ '         7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력\n'
+ '         8. exit: exit\n'
+ '        그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.\n')
 
 
 def test_shell_read_valid_format(mocker: MockerFixture, capsys):
@@ -60,11 +76,7 @@ def test_shell_read_valid_format(mocker: MockerFixture, capsys):
     shell.read("read 3")
     captured = capsys.readouterr()
 
-    mock_subprocess.assert_called_once_with(
-        [SSD_COMMAND, "R", "3"],
-        capture_output=True,
-        text=True
-    )
+    mock_subprocess.assert_called_once_with([SSD_COMMAND, "R", "3"])
     assert captured.out == "[Read] LBA 3 : 0xAAAABBBC\n"
 
 
@@ -192,7 +204,7 @@ def test_shell_erase_success(shell_and_subprocess_mocker, value):
     assert mock_run.call_count == 1
 
 @pytest.mark.parametrize("value", ["2000"])
-def test_shell_erase_success(shell_and_subprocess_mocker, value):
+def test_shell_erase_loop_success(shell_and_subprocess_mocker, value):
     shell, mock_run = shell_and_subprocess_mocker
     shell.erase(f"erase 3 {value}")
     assert mock_run.call_count == 10
