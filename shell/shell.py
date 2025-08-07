@@ -62,7 +62,12 @@ class Shell:
          5. 1_FullWriteAndReadCompare: 1_ 혹은 1_FullWriteAndReadCompare 입력
          6. 2_PartialLBAWrite: 2_ 혹은 2_PartialLBAWrite 입력
          7. 3_WriteReadAging: 3_ 혹은 3_WriteReadAging 입력
-         8. exit: exit
+         8. 4_EraseAndWriteAging: 4_ 혹은 4_EraseAndWriteAging 입력
+         9. help: help
+         10. exit: exit
+         11. flush: flush
+         12. erase: erase [LBA] [SIZE]
+         13. erase_range: erase_range [START_LBA] [END_LBA]
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
               )
 
