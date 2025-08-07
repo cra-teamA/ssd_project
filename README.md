@@ -21,7 +21,10 @@ SSD 제품을 테스트 할수있는Test Shell 을 제작
  - Test Shell 안에서 구현되는 SSD 테스트 코드
 ```
 ### 설계
-<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/7bac7b22-56cd-402e-a3f5-5ef6d7325e10" />
+- Part 1<br/>
+<img width="800" height="500" alt="image" src="https://github.com/user-attachments/assets/7bac7b22-56cd-402e-a3f5-5ef6d7325e10" /><br/>
+- Part 2<br/>
+<img width="6164" height="3248" alt="image" src="https://github.com/user-attachments/assets/4b01f812-29e8-4a0b-b5de-acd19ca1ae83" /><br/>
 
 ### 역할 분담
 - 팀장: 장진섭</br>
