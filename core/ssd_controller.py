@@ -15,16 +15,20 @@ class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
         self.buffer = CommandBuffer()
-        self.update_cache(self.buffer.get())
+        self.init_cache(self.buffer.get())
 
-    def update_cache(self, buffer):
+    def init_cache(self, buffer):
         self.cache = {}
         if buffer is None:
-            return self.cache
+            return
         for command in buffer:
-            for i in range(command.size):
-                self.cache[command.lba + i] = command.value
-        return self.cache
+            self.update_cache(command)
+        return
+
+    def update_cache(self, command):
+        for i in range(command.size):
+            self.cache[command.lba + i] = command.value
+        return
 
     def ssd_nand_init(self):
         with open(SSD_NAND_PATH, 'w') as f:
@@ -74,7 +78,10 @@ class SSDController:
         try:
             buffer = self.buffer.get()
             for command in buffer:
-                self.execute(command)
+                if command.mode == "W":
+                    self.write(command.lba, command.value)
+                elif command.mode == "E":
+                    self.erase(command.lba, command.size)
             self.buffer.truncate()
         except:
             self.output(ERROR)
@@ -91,31 +98,55 @@ class SSDController:
         return _buf_cmds
 
     def _generate_commands(self) -> list[Command]:
-        optimized_cmd = []
-        is_erase_duration = False
-        s_addr = -1
-        erase_length = -1
-        for addr, val in self.cache.items():
-            if not val:
-                if is_erase_duration:
-                    is_erase_duration = False
-                    optimized_cmd.append(command_factory('E', s_addr, erase_length))
-                continue
-
-            if val != DEFAULT_VALUE:
-                if is_erase_duration:
-                    is_erase_duration = False
-                    optimized_cmd.append(command_factory('E', s_addr, erase_length))
-                optimized_cmd.append(command_factory('W', addr, val))
-
+        new_commands = []
+        command = None
+        sorted_items = sorted(self.cache.items())
+        for addr, val in sorted_items:
+            if val == DEFAULT_VALUE:
+                if not command :
+                    command = command_factory('E', addr, 1)
+                elif command.mode == 'E' and addr == command.lba + command.size:
+                    command.size += 1
+                elif command.size or addr != command.lba + command.size:
+                    new_commands.append(command)
+                    command = command_factory('E', addr, 1)
             else:
-                if is_erase_duration:
-                    erase_length += 1
-                else:
-                    is_erase_duration = True
-                    s_addr = addr
-                    erase_length = 1
-        return optimized_cmd
+                if command :
+                    new_commands.append(command)
+                command = command_factory('W', addr, val)
+        if command:
+            new_commands.append(command)
+        return new_commands
+
+    # upgraded
+    # def _generate_commands(self) -> list[Command]:
+    #     optimized_cmd = []
+    #     is_erase_duration = False
+    #     s_addr = -1
+    #     erase_length = -1
+    #     print('cache',self.cache)
+    #     for addr, val in self.cache.items():
+    #         if not val:
+    #             if is_erase_duration:
+    #                 is_erase_duration = False
+    #                 optimized_cmd.append(command_factory('E', s_addr, erase_length))
+    #             continue
+    #
+    #         if val != DEFAULT_VALUE:
+    #             if is_erase_duration:
+    #                 is_erase_duration = False
+    #                 optimized_cmd.append(command_factory('E', s_addr, erase_length))
+    #             optimized_cmd.append(command_factory('W', addr, val))
+    #
+    #         else:
+    #             if is_erase_duration:
+    #                 erase_length += 1
+    #             else:
+    #                 is_erase_duration = True
+    #                 s_addr = addr
+    #                 erase_length = 1
+    #     print('opt',optimized_cmd)
+    #     return optimized_cmd
 
     def update_nand_txt(self, addr, val, size=1) -> None:
         if not os.path.exists(SSD_NAND_PATH):
@@ -145,6 +176,7 @@ class SSDController:
             if self.buffer.is_full():
                 self.flush()
             self.buffer.add(command)
+            self.update_cache(command)
             self.buffer_optimize()
             self.buffer.syncToDirectory()
         elif command.mode == "F":
