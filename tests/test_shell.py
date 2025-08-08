@@ -1,7 +1,7 @@
 from unittest.mock import mock_open
 import pytest
 from pytest_mock import mocker, MockerFixture
-from shell.shell_main import Shell, SSD_COMMAND
+from shell.shell_main import Shell
 from shell.shell_command import *
 from unittest.mock import call
 
