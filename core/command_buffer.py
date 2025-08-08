@@ -17,9 +17,11 @@ class CommandBuffer:
 
         #읽은 파일들을 buffer로 동기화
         self.syncToList(filenames)
+        self.syncToDirectory()
 
     def is_full(self):
         return len(self.command_buffer) >= MAX_BUFFER_SIZE
+
     def get(self)->list:
         return self.command_buffer
 
@@ -59,16 +61,17 @@ class CommandBuffer:
                 continue
 
             parts = file[i].split('_')
-            idx = int(parts[0])
+            # 파일명 형식이 4개 미만 요소면 skip
+            if len(parts) < 4:
+                continue
+
             cmd = parts[1]
             lba = int(parts[2])
             param = parts[3]
-
-
-            self.command_buffer.append(command_factory(cmd,lba,param))
+            self.command_buffer.append(command_factory(cmd, lba, param))
 
     def syncToDirectory(self):
-        #buffer 내 파일 전체 삭제
+        # buffer 내 파일 전체 삭제
         if not os.path.exists(BUFFER_DIR):
             os.makedirs(BUFFER_DIR, exist_ok=True)
 
@@ -76,7 +79,6 @@ class CommandBuffer:
             file_path = os.path.join(BUFFER_DIR, filename)
             if os.path.isfile(file_path):
                 os.remove(file_path)
-
 
         for i, cmd in enumerate(self.command_buffer):
             idx = i
@@ -89,7 +91,7 @@ class CommandBuffer:
             if command == 'W':  # 1_W_0_0x00000000.txt
 
                 filename = f"{idx}_{command}_{lba}_{value}.txt"
-            elif command == 'E':    # 2_E_3_5.txt
+            elif command == 'E':  # 2_E_3_5.txt
 
                 filename = f"{idx}_{command}_{lba}_{size}.txt"
             else:
@@ -100,6 +102,12 @@ class CommandBuffer:
             with open(filename, "w") as f:
                 pass
 
+        current_size = len(self.command_buffer)
+
+        for i in range(current_size, MAX_BUFFER_SIZE):
+            filename = os.path.join(BUFFER_DIR, f"{i}_empty.txt")
+            with open(filename, "w") as f:
+                pass
+
     def replace(self, new_buffer):
         self.command_buffer = new_buffer
-
