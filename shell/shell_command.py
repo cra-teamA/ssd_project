@@ -24,11 +24,11 @@ class Command(ABC):
             _, = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
+            raise ValueError
 
     def run(self):
-        self.logger.set_log(f"Run")
+        self.logger.set_log(f"Run....")
         self.execute()
-        self.logger.set_log(f"Done")
 
     def run_ssd_command(self, *args):
         subprocess.run([SSD_COMMAND, *map(str, args)])
@@ -58,6 +58,7 @@ class Read(Command):
             _, lba = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
+            raise ValueError
         self.lba = lba
         self.is_script = is_script
 
@@ -112,7 +113,7 @@ class Write(Command):
             _, lba, value = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
-
+            raise ValueError
         self.lba = lba
         self.value = value
         self.is_script = is_script
@@ -122,8 +123,9 @@ class Write(Command):
             raise ValueError
         if self._is_invalid_value(self.value):
             raise ValueError
-        self.run_ssd_command("W", self.lba, f"0x{int(self.value, 16) :08X}")
-        self.logger.set_log_with_print("[Write] Done", self.is_script)
+        value = f"0x{int(self.value, 16) :08X}"
+        self.run_ssd_command("W", self.lba, value)
+        self.logger.set_log_with_print(f"[Write] Done {value}", self.is_script)
 
 class FullWrite(Command):
     def __init__(self, read_command: str):
@@ -132,15 +134,16 @@ class FullWrite(Command):
             _, value = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
-
+            raise ValueError
         self.value = value
 
     def execute(self):
         if self._is_invalid_value(self.value):
             raise ValueError
+        value = f"0x{int(self.value, 16) :08X}"
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            self.run_ssd_command("W", lba, f"0x{int(self.value, 16) :08X}")
-        self.logger.set_log_with_print("[FullWrite] Done")
+            self.run_ssd_command("W", lba, value)
+        self.logger.set_log_with_print(f"[FullWrite] Done - {value}")
 
 class Erase(Command):
     def __init__(self,read_command: str, is_script: bool = False):
@@ -149,6 +152,7 @@ class Erase(Command):
             _, lba,size = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
+            raise ValueError
         self.lba = lba
         self.size = size
         self.is_script = is_script
@@ -165,7 +169,7 @@ class Erase(Command):
             start, size = new_start, new_size
         end = min(start + size - 1, MAX_LBA)
         size = end - start + 1
-        self.logger.set_log_with_print(f'[erase] lba {start} | size {size}', self.is_script)
+        self.logger.set_log_with_print(f'[Erase] lba {start} | size {size}', self.is_script)
         self._erase(start, size)
 
     def _erase(self, lba: int, size: int, label: str = None):
@@ -184,6 +188,7 @@ class EraseRange(Erase):
             _, start_lba, end_lba = read_command.split()
         except ValueError:
             self.logger.set_log(f"Invalid length {len(read_command.split())}")
+            raise ValueError
         self.start_lba = start_lba
         self.end_lba = end_lba
         self.is_script = is_script
