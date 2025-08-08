@@ -13,6 +13,7 @@ ERROR = 'ERROR'
 @pytest.fixture
 def shell_with_single_data():
     shell = Shell()
+    shell.flush("flush")
     with open(SSD_NAND_PATH, "w", encoding="utf-8") as f:
         json.dump(SINGLE_TEST_DATA, f, ensure_ascii=False)
     return shell
@@ -21,6 +22,7 @@ def get_ssd_output():
     with open(SSD_OUTPUT_PATH, "r", encoding="utf-8") as f:
         actual = f.read()
     return actual
+
 def test_shell_read_cmd_success(capsys, shell_with_single_data):
     shell = shell_with_single_data
     shell.read(f"read 1")
@@ -41,12 +43,6 @@ def test_shell_read_cmd_invalid_address(shell_with_single_data, value):
     with pytest.raises(ValueError):
         shell.read(f"read {value}")
 
-def test_shell_write_cmd_success(capsys, shell_with_single_data):
-    shell = shell_with_single_data
-    shell.read(f"write 1")
-
-    captured = capsys.readouterr()
-    assert captured.out == "[Read] LBA 1 : 0xaaaaaaa1\n"
 @pytest.mark.parametrize("addr, value", [(0,"0x0000BBBB"), (1,"0xBBBB")])
 def test_shell_write_script_success(capsys, shell_with_single_data, addr, value):
     shell = shell_with_single_data
@@ -61,9 +57,11 @@ def test_shell_write_script_success(capsys, shell_with_single_data, addr, value)
     assert captured.out == f"[Read] LBA {addr} : {value}\n"
 
 @pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
-def test_shell_write_cmd_success(capsys, shell_and_subprocess_mocker, value):
-    shell, mock_run = shell_and_subprocess_mocker
+def test_shell_write_cmd_success(capsys, shell_with_single_data, value):
+    shell = shell_with_single_data
     shell.write(f"write 3 {value}")
+    captured = capsys.readouterr()
+    assert captured.out == "[Write] Done\n"
 
 @pytest.mark.parametrize("addr, value", [(-1,"0x0000BBBB"), (100,"0xBBBB")])
 def test_shell_write_cmd_invalid_address(shell_with_single_data, addr, value):
