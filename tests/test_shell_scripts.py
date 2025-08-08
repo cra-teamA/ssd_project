@@ -1,6 +1,6 @@
 import pytest
 
-from shell.shell import Shell
+from shell.shell_main import Shell
 from scripts.FullWriteReadCompare import FullWriteReadCompare
 from scripts.PartialLBAWrite import PartialLBAWrite
 from scripts.WriteReadAging import WriteReadAging

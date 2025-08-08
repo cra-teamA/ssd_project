@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock
 from scripts.FullWriteReadCompare import FullWriteReadCompare
-from shell.shell import Shell
+from shell.shell_main import Shell
 from scripts.BaseScript import BaseScript
 
 

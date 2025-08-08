@@ -1,4 +1,4 @@
-from shell.shell import Shell
+from shell.shell_main import Shell
 import pytest
 import json
 import os
