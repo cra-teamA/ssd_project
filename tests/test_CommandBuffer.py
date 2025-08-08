@@ -13,7 +13,7 @@ def test_init_command_buffer():
 
 def test_init_calls_method(monkeypatch):
     # readDirectory, syncToList를 patch해서 호출여부 확인
-    with patch.object(CommandBuffer, "readDirectory", return_value=['0_W_1_0x44442222.txt', '1_E_25_10.txt']) as mock_read, \
+    with patch.object(CommandBuffer, "_readDirectory", return_value=['0_W_1_0x44442222.txt', '1_E_25_10.txt']) as mock_read, \
             patch.object(CommandBuffer, "syncToList") as mock_sync:
         buffer = CommandBuffer()
         # 두 메소드가 생성자에서 호출됐는지 확인
