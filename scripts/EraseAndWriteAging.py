@@ -8,7 +8,7 @@ class EraseAndWriteAging(BaseScript):
         try:
             for loop in range(30):
                 self.erase_lba(0, 3)
-                for start_lba in range(2, 96, 2):
+                for start_lba in range(2, 97, 2):
                     self.write_lba(start_lba, "0x00000001")
                     self.write_lba(start_lba, "0x00000002")
                     self.erase_lba(start_lba, 3)
