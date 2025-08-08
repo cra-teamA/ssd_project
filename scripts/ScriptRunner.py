@@ -14,8 +14,7 @@ class ScriptRunner:
         "4": EraseAndWriteAging
     }
 
-    def __init__(self, shell_instance):
-        self.shell = shell_instance
+    def __init__(self):
         self.valid_script_names = []
         for script_idx, script_class in self.script_mapping.items():
             self.valid_script_names.append(script_idx + '_')
@@ -31,7 +30,7 @@ class ScriptRunner:
             return
 
         script_class = self.script_mapping.get(command.split('_')[0])
-        script = script_class(self.shell)
+        script = script_class()
 
         if script.run():
             print("PASS")
@@ -54,7 +53,7 @@ class ScriptRunner:
                         return
 
                     script_class = self.script_mapping.get(command.split('_')[0])
-                    script = script_class(self.shell)
+                    script = script_class()
 
                     if script.run():
                         print("Pass")

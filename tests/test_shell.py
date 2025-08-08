@@ -1,14 +1,15 @@
 from unittest.mock import mock_open
 import pytest
 from pytest_mock import mocker, MockerFixture
-from shell.shell import Shell, SSD_OUTPUT_PATH, SSD_COMMAND
+from shell.shell_main import Shell, SSD_COMMAND
+from shell.shell_command import *
 from unittest.mock import call
 
 
 @pytest.fixture
 def shell_and_subprocess_mocker(mocker: MockerFixture):
     shell = Shell()
-    mock_run = mocker.patch("shell.shell.subprocess.run")
+    mock_run = mocker.patch("shell.shell_command.subprocess.run")
     return shell, mock_run
 
 def test_shell_exit(mocker: MockerFixture, capsys):
@@ -73,7 +74,7 @@ def test_shell_help(capsys):
 
 
 def test_shell_read_valid_format(mocker: MockerFixture, capsys):
-    mock_subprocess = mocker.patch("shell.shell.subprocess.run")
+    mock_subprocess = mocker.patch("shell.shell_command.subprocess.run")
     fake_output_content = "0xAAAABBBC\n"
     mocker.patch(
         "builtins.open",
@@ -103,7 +104,7 @@ def test_shell_read_invalid_format(mocker: MockerFixture):
 
 def test_shell_valid_lba(mocker: MockerFixture):
     mocker.patch("builtins.input", return_value="read 3")
-    mock_subprocess = mocker.patch("shell.shell.subprocess.run")
+    mock_subprocess = mocker.patch("shell.shell_command.subprocess.run")
     fake_output_content = "0xAAAABBBC\n"
     mocker.patch(
         "builtins.open",
@@ -124,7 +125,7 @@ def test_shell_invalid_lba(mocker: MockerFixture):
 
 def test_shell_is_script(mocker: MockerFixture, capsys):
     shell = Shell()
-    mock_subprocess = mocker.patch("shell.shell.subprocess.run")
+    mock_subprocess = mocker.patch("shell.shell_command.subprocess.run")
     fake_output_content = "0xAAAABBBC\n"
     mocker.patch(
         "builtins.open",

@@ -1,22 +1,26 @@
 from abc import ABC, abstractmethod
+from shell.shell_command import Write,Read,Erase
 
 class BaseScript(ABC):
 
-    def __init__(self, shell_interface):
-        self.shell = shell_interface  # read/write interface
+    def __init__(self):
         self.isCommandFromScript = True
 
     def write_lba(self, lba : int, data : str):
         cmd = f"write {lba} {data}"
-        self.shell.write(cmd,self.isCommandFromScript)
+        write_command = Write(cmd,self.isCommandFromScript)
+        write_command.run()
 
     def read_lba(self, lba : int):
         cmd = f"read {lba}"
-        return self.shell.read(cmd,self.isCommandFromScript)
+        read_command = Read(cmd,self.isCommandFromScript)
+        read_command.run()
+        return read_command.result
 
     def erase_lba(self, lba : int, size : int):
         cmd = f"erase {lba} {size}"
-        self.shell.erase(cmd, self.isCommandFromScript)
+        erase_command = Erase(cmd, self.isCommandFromScript)
+        erase_command.run()
 
     @abstractmethod
     def run(self):
