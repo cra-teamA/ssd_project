@@ -1,5 +1,4 @@
 import os
-from dataclasses import dataclass
 
 from core.command import Command, command_factory
 
@@ -12,14 +11,11 @@ class CommandBuffer:
 
     def __init__(self):
         self.command_buffer=[]
-        #buffer 디렉토리내 파일 읽기
         filenames = self.readDirectory()
-
-        #읽은 파일들을 buffer로 동기화
         self.syncToList(filenames)
         self.syncToDirectory()
 
-    def is_full(self):
+    def is_full(self) -> int:
         return len(self.command_buffer) >= MAX_BUFFER_SIZE
 
     def get(self)->list:
@@ -41,12 +37,12 @@ class CommandBuffer:
 
 
     def readDirectory(self) -> list[str]:
-        if not os.path.exists(BUFFER_DIR):
-            os.makedirs(BUFFER_DIR, exist_ok=True)
+        self.is_buffer_directory_valid()
 
-        filenames = [f for f in os.listdir(BUFFER_DIR) if os.path.isfile(os.path.join(BUFFER_DIR, f))]
-        sorted_files = sorted(filenames)
-        return sorted_files
+        filenames = sorted(
+            [f for f in os.listdir(BUFFER_DIR) if os.path.isfile(os.path.join(BUFFER_DIR, f))]
+        )
+        return filenames
 
 
     def syncToList(self , filenames):
@@ -55,31 +51,32 @@ class CommandBuffer:
         filenames = filenames[:MAX_BUFFER_SIZE]
         file = filenames.copy()
 
-        for i in range(MAX_BUFFER_SIZE):
+        for i in range(len(filenames)):
             file[i] = file[i].rsplit('.', 1)[0]
             if file[i] == '':
                 continue
 
             parts = file[i].split('_')
-            # 파일명 형식이 4개 미만 요소면 skip
             if len(parts) < 4:
                 continue
 
-            cmd = parts[1]
-            lba = int(parts[2])
-            param = parts[3]
-            self.command_buffer.append(command_factory(cmd, lba, param))
+            self.add(command_factory(parts[1], int(parts[2]), parts[3]))
+
 
     def syncToDirectory(self):
-        # buffer 내 파일 전체 삭제
-        if not os.path.exists(BUFFER_DIR):
-            os.makedirs(BUFFER_DIR, exist_ok=True)
+        self.is_buffer_directory_valid()
+        self.remove_file(BUFFER_DIR)
+        self.create_file()
+        self.create_empty_file()
 
-        for filename in os.listdir(BUFFER_DIR):
-            file_path = os.path.join(BUFFER_DIR, filename)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
+    def create_empty_file(self):
+        current_size = len(self.command_buffer)
+        for i in range(current_size, MAX_BUFFER_SIZE):
+            filename = os.path.join(BUFFER_DIR, f"{i}_empty.txt")
+            with open(filename, "w") as f:
+                pass
 
+    def create_file(self):
         for i, cmd in enumerate(self.command_buffer):
             idx = i
             command = cmd.mode
@@ -89,10 +86,8 @@ class CommandBuffer:
 
             # 파일명 생성
             if command == 'W':  # 1_W_0_0x00000000.txt
-
                 filename = f"{idx}_{command}_{lba}_{value}.txt"
             elif command == 'E':  # 2_E_3_5.txt
-
                 filename = f"{idx}_{command}_{lba}_{size}.txt"
             else:
                 continue  # 기타 명령은 건너뜀
@@ -102,12 +97,17 @@ class CommandBuffer:
             with open(filename, "w") as f:
                 pass
 
-        current_size = len(self.command_buffer)
-
-        for i in range(current_size, MAX_BUFFER_SIZE):
-            filename = os.path.join(BUFFER_DIR, f"{i}_empty.txt")
-            with open(filename, "w") as f:
-                pass
+    def remove_file(self,file_directory):
+        for filename in os.listdir(file_directory):
+            file_path = os.path.join(file_directory, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
     def replace(self, new_buffer):
         self.command_buffer = new_buffer
+
+    def is_buffer_directory_valid(self):
+        if not os.path.exists(BUFFER_DIR):
+            os.makedirs(BUFFER_DIR, exist_ok=True)
+
+buffer = CommandBuffer()
