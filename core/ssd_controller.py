@@ -91,14 +91,11 @@ class SSDController:
             return False
 
     def buffer_optimize(self):
-        generated_commands = self.optimizer.generate_new_commands()
-        picked_cmd = self._pick_smaller_commands(generated_commands, self.buffer.get())
+        generated_commands = self.optimizer.generate_new_commands(self.cache)
+        picked_cmd = self.optimizer.pick_smaller_commands(generated_commands, self.buffer.get())
         self.buffer.replace(picked_cmd)
 
-    def _pick_smaller_commands(self, generated_commands: list[Command], _buf_cmds: list[Command]) -> list[Command]:
-        if len(generated_commands) < len(_buf_cmds):
-            return generated_commands
-        return _buf_cmds
+
 
     def update_nand_txt(self, addr, val, size=1) -> None:
         if not os.path.exists(SSD_NAND_PATH):

@@ -148,7 +148,7 @@ def test_controller_pick_smaller_commands(optimizer, buff_cmd, optimized_cmd):
     picked = buff_cmd
     if len(optimized_cmd) < len(buff_cmd):
         picked = optimized_cmd
-    assert optimizer._pick_smaller_commands(optimized_cmd, buff_cmd) == picked
+    assert optimizer.pick_smaller_commands(optimized_cmd, buff_cmd) == picked
 
 
 @pytest.mark.parametrize("buff_cmd, optimized_cmd_class", [(case['buff'], case['optimized']) for case in cases_cls])

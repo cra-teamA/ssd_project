@@ -29,3 +29,8 @@ class Optimizer:
         if command:
             new_commands.append(command)
         return new_commands
+
+    def pick_smaller_commands(self, generated_commands: list[Command], buf_cmds: list[Command]) -> list[Command]:
+        if len(generated_commands) < len(buf_cmds):
+            return generated_commands
+        return buf_cmds
