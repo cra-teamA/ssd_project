@@ -28,7 +28,7 @@ class Shell:
     def read(self, read_command: str, is_script: bool = False):
         _read = Read(read_command,is_script)
         _read.run()
-        return _read.return_value
+        return _read.result
     def fullread(self, read_command: str):
         _full_read = FullRead(read_command)
         _full_read.run()

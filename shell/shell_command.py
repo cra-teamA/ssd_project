@@ -50,7 +50,7 @@ class Command(ABC):
 class Read(Command):
     def __init__(self, read_command: str, is_script: bool = False):
         self.logger = Logger()
-        self.return_value = None
+        self.result = None
         _, lba = read_command.split()
         self.lba = lba
         self.is_script = is_script
@@ -62,7 +62,7 @@ class Read(Command):
         with open(SSD_OUTPUT_PATH, 'r', encoding='utf-8') as file:
             line = file.readline().strip()
         self.logger.set_log_with_print(f"[Read] LBA {self.lba} : {line}", self.is_script)
-        self.return_value = line
+        self.result = line
 
 class FullRead(Command):
     def execute(self):

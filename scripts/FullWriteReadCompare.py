@@ -1,9 +1,6 @@
 from .BaseScript import BaseScript
 
 class FullWriteReadCompare(BaseScript):
-    def __init__(self, shell_interface):
-        super().__init__(shell_interface)
-
     def run(self):
         lba_total = 100
         group_size = 5

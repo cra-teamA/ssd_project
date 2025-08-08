@@ -15,7 +15,7 @@ class BaseScript(ABC):
         cmd = f"read {lba}"
         read_command = Read(cmd,self.isCommandFromScript)
         read_command.run()
-        return read_command.return_value
+        return read_command.result
 
     def erase_lba(self, lba : int, size : int):
         cmd = f"erase {lba} {size}"

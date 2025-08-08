@@ -2,9 +2,6 @@ from .BaseScript import BaseScript
 import random
 
 class PartialLBAWrite(BaseScript):
-    def __init__(self, shell_interface):
-        super().__init__(shell_interface)
-
     def run(self):
         lbas = [4, 0, 3, 1, 2]
         LOOP_COUNT = 30
