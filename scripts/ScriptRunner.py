@@ -5,8 +5,8 @@ from scripts.FullWriteReadCompare import FullWriteReadCompare
 from scripts.PartialLBAWrite import PartialLBAWrite
 from scripts.WriteReadAging import WriteReadAging
 
-class ScriptRunner:
 
+class ScriptRunner:
     script_mapping = {
         "1": FullWriteReadCompare,
         "2": PartialLBAWrite,
@@ -33,7 +33,7 @@ class ScriptRunner:
         script_class = self.script_mapping.get(command.split('_')[0])
         script = script_class(self.shell)
 
-        if script.run() :
+        if script.run():
             print("PASS")
         else:
             print("FAIL")
