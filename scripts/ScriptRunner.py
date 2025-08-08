@@ -22,11 +22,13 @@ class ScriptRunner:
             self.valid_script_names.append(script_idx + '_' + script_class.__name__)
 
     def run(self, command: str):
+        if ".txt" in command:
+            self.run_script_file(command)
+            return
+
         if command not in self.valid_script_names:
             print("INVALID COMMAMD")
             return
-        elif command.startswith("shell"):
-            self.run_script_file(command.split()[1])
 
         script_class = self.script_mapping.get(command.split('_')[0])
         script = script_class(self.shell)

@@ -187,7 +187,7 @@ def main():
     if len(sys.argv) == 1:
         shell_command_mode(shell)
     else:
-        shell.run_script(f"shell {sys.argv[1]}")
+        shell.run_script(f"{sys.argv[1]}")
 
 
 if __name__ == "__main__":
