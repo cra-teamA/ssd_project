@@ -34,14 +34,12 @@ def test_script_run_called(command, idx, expected_called):
             class_name,
             (),
             {
-                "__init__": lambda self, shell: None,
                 "run": lambda self: mock_instance.run()
             }
         )
 
         ScriptRunner.script_mapping[idx] = MockScript
-    mock_shell = Mock()
-    runner = ScriptRunner(mock_shell)
+    runner = ScriptRunner()
     runner.run(command)
 
     if expected_called:
