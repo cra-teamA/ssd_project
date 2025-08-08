@@ -1,5 +1,6 @@
 from .BaseScript import BaseScript
 
+
 class FullWriteReadCompare(BaseScript):
     def run(self):
         lba_total = 100
@@ -22,4 +23,3 @@ class FullWriteReadCompare(BaseScript):
             return True
         except Exception as e:
             return False
-

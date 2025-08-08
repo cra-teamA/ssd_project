@@ -7,6 +7,7 @@ def test_partial_lba_write_class_can_be_instantiated(mocker):
     instance = PartialLBAWrite()
     assert isinstance(instance, PartialLBAWrite)
 
+
 def test_partial_lba_write_passes(mocker):
     fake_memory = {}
 
@@ -23,6 +24,7 @@ def test_partial_lba_write_passes(mocker):
     result = script.run()
 
     assert result is True
+
 
 def test_partial_lba_write_fails_on_mismatch(mocker):
     def fake_write(self, lba, data):

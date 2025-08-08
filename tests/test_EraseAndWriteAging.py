@@ -8,6 +8,7 @@ def test_erase_and_write_aging_class_can_be_instantiated(mocker):
     instance = EraseAndWriteAging()
     assert isinstance(instance, EraseAndWriteAging)
 
+
 def test_erase_and_write_aging_succeeds(mocker):
     fake_memory = {}
 
@@ -22,14 +23,17 @@ def test_erase_and_write_aging_succeeds(mocker):
             fake_memory[lba] = '0x00000000'
 
 
+
     mocker.patch.object(BaseScript, 'read_lba', fake_read)
     mocker.patch.object(BaseScript, 'write_lba', fake_write)
     mocker.patch.object(BaseScript, 'erase_lba', fake_erase)
 
     script = EraseAndWriteAging()
+
     result = script.run()
 
     assert result is True
+
 
 def test_erase_and_write_aging_class_when_data_mismatch(mocker):
     def fake_write(self, lba, data):

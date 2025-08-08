@@ -1,6 +1,7 @@
 from .BaseScript import BaseScript
 import random
 
+
 class PartialLBAWrite(BaseScript):
     def run(self):
         lbas = [4, 0, 3, 1, 2]

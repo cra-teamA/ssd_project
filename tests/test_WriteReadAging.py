@@ -6,6 +6,7 @@ def test_partial_lba_write_class_can_be_instantiated(mocker):
     instance = WriteReadAging()
     assert isinstance(instance, WriteReadAging)
 
+
 def test_write_read_aging_succeeds(mocker):
 
     # LBA마다 읽은 값이 항상 쓰인 값과 같도록 설정
@@ -24,6 +25,7 @@ def test_write_read_aging_succeeds(mocker):
     result = script.run()
 
     assert result is True
+
 
 def test_write_read_aging_fails_when_data_mismatch(mocker):
     def fake_write(self, lba, data):
