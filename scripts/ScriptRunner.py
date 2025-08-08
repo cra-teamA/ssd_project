@@ -6,8 +6,6 @@ from scripts.PartialLBAWrite import PartialLBAWrite
 from scripts.WriteReadAging import WriteReadAging
 from shell.logger import Logger
 
-print = Logger().set_log_with_print
-
 class ScriptRunner:
     script_mapping = {
         "1": FullWriteReadCompare,
@@ -32,13 +30,13 @@ class ScriptRunner:
 
         if not self.is_valid_script_command(command):
             Logger().set_log(f"Invalid CMD: {command}")
-            print("INVALID COMMAMD")
+            Logger().set_log_with_print("INVALID COMMAMD")
             return
 
         script_class = self.script_mapping.get(command.split('_')[0])
         script = script_class()
 
-        print("PASS" if script.run() else "FAIL")
+        Logger().set_log_with_print("PASS" if script.run() else "FAIL")
 
     def run_script_file(self, script_filename):
         try:
@@ -52,16 +50,16 @@ class ScriptRunner:
 
                     if not self.is_valid_script_command(command):
                         Logger().set_log(f"Invalid CMD: {command}")
-                        print("INVALID COMMAMD")
+                        Logger().set_log_with_print("INVALID COMMAMD")
                         return
 
                     script_class = self.script_mapping.get(command.split('_')[0])
                     script = script_class()
 
-                    print("PASS" if script.run() else "FAIL!")
+                    Logger().set_log_with_print("PASS" if script.run() else "FAIL!")
 
 
         except FileNotFoundError:
-            print(f"[Error] Script file not found in upper directory: {script_filename}")
+            Logger().set_log_with_print(f"[Error] Script file not found in upper directory: {script_filename}")
         except Exception as e:
-            print(f"[Error] Failed to run script file: {e}")
+            Logger().set_log_with_print(f"[Error] Failed to run script file: {e}")
