@@ -1,18 +1,18 @@
 import pytest
 from pytest_mock import mocker
 from core.ssd_controller import SSDController
-from core.command import Command, DEFAULT_VALUE
+from core.command import command_factory, DEFAULT_VALUE
 
 
 @pytest.fixture
 def successs_buffer():
     buffer = [
-        Command("W", 0, "0xAAAABBBB"),
-        Command("W", 1, "0xCCCCDDDD"),
-        Command("E", 2, 10),
-        Command("W", 3, "0x12345678"),
-        Command("E", 4, 1),
-        Command("W", 5, "0xDEADBEEF")
+        command_factory("W", 0, "0xAAAABBBB"),
+        command_factory("W", 1, "0xCCCCDDDD"),
+        command_factory("E", 2, 10),
+        command_factory("W", 3, "0x12345678"),
+        command_factory("E", 4, 1),
+        command_factory("W", 5, "0xDEADBEEF")
     ]
     cache = {0: '0xAAAABBBB',
              1: '0xCCCCDDDD',
@@ -32,5 +32,5 @@ def successs_buffer():
 def test_update_cache_success(successs_buffer):
     buffer, expected_cache = successs_buffer
     ssd = SSDController()
-
-    assert ssd.init_cache(buffer) == expected_cache
+    ssd.init_cache(buffer)
+    assert ssd.cache == expected_cache
