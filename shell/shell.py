@@ -55,7 +55,7 @@ class Shell:
         _flush.run()
 
     def run_script(self, command):
-        runner = ScriptRunner(self)
+        runner = ScriptRunner()
         runner.run(command)
 
 
