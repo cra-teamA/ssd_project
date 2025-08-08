@@ -7,3 +7,4 @@ ssd_nand.txt
 ssd_output.txt
 build/
 log/
+buffer/

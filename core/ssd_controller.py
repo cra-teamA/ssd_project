@@ -154,10 +154,12 @@ class SSDController:
         try:
             with open(SSD_NAND_PATH, "r") as f:
                 memory = json.load(f)
-                for i in range(size):
-                    memory[str(addr + i)] = val.lower()
-        except json.decoder.JSONDecodeError:
-            self.ssd_nand_init()
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            memory = {}
+
+        for i in range(size):
+            memory[str(addr + i)] = val.lower()
+
         with open(SSD_NAND_PATH, "w") as f:
             json.dump(memory, f)
 
@@ -171,7 +173,10 @@ class SSDController:
 
     def execute(self, command: Command):
         if command.mode == "R":
-            self.read(command.lba)
+            if command.lba in self.cache.keys():
+                self.output(self.cache[command.lba])
+            else:
+                self.read(command.lba)
         elif command.mode == "W" or command.mode == "E":
             if self.buffer.is_full():
                 self.flush()
