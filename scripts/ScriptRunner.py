@@ -21,7 +21,7 @@ class ScriptRunner:
         if '_' not in cmd:
             return False
         idx, script_name = cmd.split('_', 1)
-        return idx in self.script_mapping and script_name == self.script_mapping[idx].__name__
+        return idx in self.script_mapping and (script_name == self.script_mapping[idx].__name__ or script_name == '')
 
     def run(self, command: str):
         if ".txt" in command:
