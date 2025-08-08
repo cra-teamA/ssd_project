@@ -43,23 +43,26 @@ class Logger:
         return cls_name, func_name
 
     def set_log_with_print(self, message: str, is_block: bool = False):
-        self.set_log(message)
+        cls_name, func_name = self._get_caller_info()
+        caller = f"{cls_name}.{func_name}"
+        self._logging(caller, message)
         if not is_block:
             print(message)
 
     def set_log(self, message: str):
         cls_name, func_name = self._get_caller_info()
-        time_stamp = datetime.datetime.now().strftime(TIME_STAMP_FORMAT)
         caller = f"{cls_name}.{func_name}"
-        log = f"[{time_stamp}] {caller:30} {message}"
-        self._logging(log)
 
-    def _logging(self, log_message: str):
+        self._logging(caller, message)
+
+    def _logging(self, caller:str, message: str):
         if self._check_log_file_size_max():
             self._compress_log_file()
             self._change_log_file_name()
+        time_stamp = datetime.datetime.now().strftime(TIME_STAMP_FORMAT)
+        log = f"[{time_stamp}] {caller:30} {message}"
         with open(self.log_file, 'a', encoding='utf-8') as f:
-            f.write(log_message + '\n')
+            f.write(log + '\n')
 
     def _compress_log_file(self):
         for filename in os.listdir('.'):
