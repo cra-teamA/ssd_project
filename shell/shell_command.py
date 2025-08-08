@@ -18,14 +18,17 @@ SSD_COMMAND = os.path.join(PROJECT_ROOT, 'ssd.bat')
 
 
 class Command(ABC):
-    def __init__(self, read_command):
+    def __init__(self, read_command: str):
         self.logger = Logger()
-        _, = read_command.split()
+        try:
+            _, = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
 
     def run(self):
-        self.logger.set_log("Run")
+        self.logger.set_log(f"Run")
         self.execute()
-        self.logger.set_log("Done")
+        self.logger.set_log(f"Done")
 
     def run_ssd_command(self, *args):
         subprocess.run([SSD_COMMAND, *map(str, args)])
@@ -51,7 +54,10 @@ class Read(Command):
     def __init__(self, read_command: str, is_script: bool = False):
         self.logger = Logger()
         self.result = None
-        _, lba = read_command.split()
+        try:
+            _, lba = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
         self.lba = lba
         self.is_script = is_script
 
@@ -94,7 +100,6 @@ class Help(Command):
         그 외 명령어 입력 시, INVALID COMMAND 가 출력 됩니다.'''
               )
 
-
 class Exit(Command):
     def execute(self):
         self.logger.set_log_with_print("Exiting shell...")
@@ -103,7 +108,11 @@ class Exit(Command):
 class Write(Command):
     def __init__(self, read_command: str, is_script: bool = False):
         self.logger = Logger()
-        _, lba, value = read_command.split()
+        try:
+            _, lba, value = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
+
         self.lba = lba
         self.value = value
         self.is_script = is_script
@@ -116,11 +125,14 @@ class Write(Command):
         self.run_ssd_command("W", self.lba, f"0x{int(self.value, 16) :08X}")
         self.logger.set_log_with_print("[Write] Done", self.is_script)
 
-
 class FullWrite(Command):
     def __init__(self, read_command: str):
         self.logger = Logger()
-        _, value = read_command.split()
+        try:
+            _, value = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
+
         self.value = value
 
     def execute(self):
@@ -130,11 +142,13 @@ class FullWrite(Command):
             self.run_ssd_command("W", lba, f"0x{int(self.value, 16) :08X}")
         self.logger.set_log_with_print("[FullWrite] Done")
 
-
 class Erase(Command):
     def __init__(self,read_command: str, is_script: bool = False):
         self.logger = Logger()
-        _, lba, size = read_command.split()
+        try:
+            _, lba,size = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
         self.lba = lba
         self.size = size
         self.is_script = is_script
@@ -166,7 +180,10 @@ class Erase(Command):
 class EraseRange(Erase):
     def __init__(self,read_command: str, is_script: bool = False):
         self.logger = Logger()
-        _, start_lba, end_lba = read_command.split()
+        try:
+            _, start_lba, end_lba = read_command.split()
+        except ValueError:
+            self.logger.set_log(f"Invalid length {len(read_command.split())}")
         self.start_lba = start_lba
         self.end_lba = end_lba
         self.is_script = is_script

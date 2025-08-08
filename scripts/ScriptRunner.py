@@ -31,6 +31,7 @@ class ScriptRunner:
             return
 
         if not self.is_valid_script_command(command):
+            Logger().set_log(f"Invalid CMD: {command}")
             print("INVALID COMMAMD")
             return
 
@@ -50,6 +51,7 @@ class ScriptRunner:
                     print(command, ' ___ ', "Run...", end='', flush=True)
 
                     if not self.is_valid_script_command(command):
+                        Logger().set_log(f"Invalid CMD: {command}")
                         print("INVALID COMMAMD")
                         return
 
