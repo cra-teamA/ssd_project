@@ -1,5 +1,6 @@
 from .BaseScript import BaseScript
 
+
 class EraseAndWriteAging(BaseScript):
     def __init__(self, shell_interface):
         super().__init__(shell_interface)

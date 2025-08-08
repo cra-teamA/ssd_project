@@ -1,5 +1,6 @@
 from .BaseScript import BaseScript
 
+
 class FullWriteReadCompare(BaseScript):
     def __init__(self, shell_interface):
         super().__init__(shell_interface)
@@ -25,4 +26,3 @@ class FullWriteReadCompare(BaseScript):
             return True
         except Exception as e:
             return False
-

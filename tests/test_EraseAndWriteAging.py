@@ -8,6 +8,7 @@ def test_erase_and_write_aging_class_can_be_instantiated(mocker):
     instance = EraseAndWriteAging(mock_shell)
     assert isinstance(instance, EraseAndWriteAging)
 
+
 def test_erase_and_write_aging_succeeds(mocker):
     mock_shell = mocker.Mock()
 
@@ -31,11 +32,11 @@ def test_erase_and_write_aging_succeeds(mocker):
     mock_shell.read.side_effect = fake_read
     mock_shell.erase.side_effect = fake_erase
 
-
     script = EraseAndWriteAging(mock_shell)
     result = script.run()
 
     assert result is True
+
 
 def test_erase_and_write_aging_class_when_data_mismatch(mocker):
     mock_shell = mocker.Mock()

@@ -8,6 +8,7 @@ def test_partial_lba_write_class_can_be_instantiated(mocker):
     instance = PartialLBAWrite(mock_shell)
     assert isinstance(instance, PartialLBAWrite)
 
+
 def test_partial_lba_write_passes(mocker):
     mock_shell = mocker.Mock(spec=Shell)
 
@@ -28,6 +29,7 @@ def test_partial_lba_write_passes(mocker):
     result = script.run()
 
     assert result is True
+
 
 def test_partial_lba_write_fails_on_mismatch(mocker):
     mock_shell = mocker.Mock(spec=Shell)
