@@ -15,17 +15,20 @@ class ScriptRunner:
     }
 
     def __init__(self):
-        self.valid_script_names = []
-        for script_idx, script_class in self.script_mapping.items():
-            self.valid_script_names.append(script_idx + '_')
-            self.valid_script_names.append(script_idx + '_' + script_class.__name__)
+        pass
+
+    def is_valid_script_command(self, cmd: str) -> bool:
+        if '_' not in cmd:
+            return False
+        idx, script_name = cmd.split('_', 1)
+        return idx in self.script_mapping and script_name == self.script_mapping[idx].__name__
 
     def run(self, command: str):
         if ".txt" in command:
             self.run_script_file(command)
             return
 
-        if command not in self.valid_script_names:
+        if not self.is_valid_script_command(command):
             print("INVALID COMMAMD")
             return
 
@@ -48,7 +51,7 @@ class ScriptRunner:
                     command = line.strip()
                     print(command, ' ___ ', "Run...", end='', flush=True)
 
-                    if command not in self.valid_script_names:
+                    if not self.is_valid_script_command(command):
                         print("INVALID COMMAMD")
                         return
 
