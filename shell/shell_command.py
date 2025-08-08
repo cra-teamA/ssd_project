@@ -123,9 +123,8 @@ class Write(Command):
             raise ValueError
         if self._is_invalid_value(self.value):
             raise ValueError
-        value = f"0x{int(self.value, 16) :08X}"
-        self.run_ssd_command("W", self.lba, value)
-        self.logger.set_log_with_print(f"[Write] Done {value}", self.is_script)
+        self.run_ssd_command("W", self.lba, f"0x{int(self.value, 16) :08X}")
+        self.logger.set_log_with_print(f"[Write] Done | lba {self.lba} | value {self.value}", self.is_script)
 
 class FullWrite(Command):
     def __init__(self, read_command: str):
@@ -140,10 +139,9 @@ class FullWrite(Command):
     def execute(self):
         if self._is_invalid_value(self.value):
             raise ValueError
-        value = f"0x{int(self.value, 16) :08X}"
         for lba in range(MIN_LBA, MAX_LBA + 1):
-            self.run_ssd_command("W", lba, value)
-        self.logger.set_log_with_print(f"[FullWrite] Done - {value}")
+            self.run_ssd_command("W", lba, f"0x{int(self.value, 16) :08X}")
+        self.logger.set_log_with_print(f"[FullWrite] Done | value {self.value}")
 
 class Erase(Command):
     def __init__(self,read_command: str, is_script: bool = False):
@@ -201,7 +199,7 @@ class EraseRange(Erase):
         start = max(start, MIN_LBA)
         end = min(end, MAX_LBA)
         size = end - start + 1
-        self.logger.set_log_with_print(f'[erase range] lba {start} | size {size}', self.is_script)
+        self.logger.set_log_with_print(f'[Erase range] lba {start} | size {size}', self.is_script)
         self._erase(start, size)
 
 class Flush(Command):
