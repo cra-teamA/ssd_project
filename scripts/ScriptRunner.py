@@ -4,7 +4,9 @@ from scripts.EraseAndWriteAging import EraseAndWriteAging
 from scripts.FullWriteReadCompare import FullWriteReadCompare
 from scripts.PartialLBAWrite import PartialLBAWrite
 from scripts.WriteReadAging import WriteReadAging
+from shell.logger import Logger
 
+print = Logger().set_log_with_print
 
 class ScriptRunner:
     script_mapping = {
