@@ -5,6 +5,8 @@ from core.validator import ControllerValidator
 from core.command import Command, command_factory, DEFAULT_VALUE
 from core.command_buffer import CommandBuffer
 
+MAX_ERASE_SIZE = 10
+
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
@@ -107,6 +109,9 @@ class SSDController:
                     command = command_factory('E', addr, 1)
                 elif command.mode == 'E' and addr == command.lba + command.size:
                     command.size += 1
+                    if command.size >= MAX_ERASE_SIZE:
+                        new_commands.append(command)
+                        command = None
                 elif command.size or addr != command.lba + command.size:
                     new_commands.append(command)
                     command = command_factory('E', addr, 1)
