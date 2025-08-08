@@ -60,6 +60,11 @@ def test_shell_write_script_success(capsys, shell_with_single_data, addr, value)
     value = f"0x{int(value, 16) :08X}".lower()
     assert captured.out == f"[Read] LBA {addr} : {value}\n"
 
+@pytest.mark.parametrize("value", ["0x0000BBBB", "0xBBBB"])
+def test_shell_write_cmd_success(capsys, shell_and_subprocess_mocker, value):
+    shell, mock_run = shell_and_subprocess_mocker
+    shell.write(f"write 3 {value}")
+
 @pytest.mark.parametrize("addr, value", [(-1,"0x0000BBBB"), (100,"0xBBBB")])
 def test_shell_write_cmd_invalid_address(shell_with_single_data, addr, value):
     shell = shell_with_single_data

@@ -122,6 +122,7 @@ cases_cls = [
 
 def make_temp_cache(cmds) -> dict:
     cache_temp = {i: None for i in range(캐시사이즈)}
+    cache_temp = {}
     for cmd in cmds:
         if cmd.mode == 'E':
             for i in range(cmd.lba, cmd.lba + cmd.size):
@@ -152,4 +153,10 @@ def test_controller_pick_smaller_commands(controller, buff_cmd, optimized_cmd):
 def test_controller_generate_commands_method(controller, buff_cmd, optimized_cmd_class):
     temp_cache = make_temp_cache(buff_cmd)
     controller.cache = temp_cache
-    assert controller._generate_commands() == optimized_cmd_class
+    actual = controller._generate_commands()
+    print(temp_cache)
+    for command in actual:
+        print(command.mode, command.lba, command.size, command.value)
+    for command in optimized_cmd_class:
+        print(command.mode, command.lba, command.size, command.value)
+    assert actual == optimized_cmd_class

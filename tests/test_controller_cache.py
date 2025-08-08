@@ -33,4 +33,4 @@ def test_update_cache_success(successs_buffer):
     buffer, expected_cache = successs_buffer
     ssd = SSDController()
 
-    assert ssd.update_cache(buffer) == expected_cache
+    assert ssd.init_cache(buffer) == expected_cache

@@ -33,10 +33,10 @@ class CommandBuffer:
         self.command_buffer = []
         self.syncToDirectory()
 
-    def print(self):
+    def print(self, prefix=''):
         for i, cmd in enumerate(self.command_buffer):
             if cmd is not None:
-                print(f"buffer[{i}] : {cmd.mode}, {cmd.lba}, {cmd.size}, {cmd.value}")
+                print(f"{prefix}buffer[{i}] : {cmd.mode}, {cmd.lba}, {cmd.size}, {cmd.value}")
         return
 
 
