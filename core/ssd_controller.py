@@ -173,7 +173,10 @@ class SSDController:
 
     def execute(self, command: Command):
         if command.mode == "R":
-            self.read(command.lba)
+            if command.lba in self.cache.keys():
+                self.output(self.cache[command.lba])
+            else:
+                self.read(command.lba)
         elif command.mode == "W" or command.mode == "E":
             if self.buffer.is_full():
                 self.flush()
