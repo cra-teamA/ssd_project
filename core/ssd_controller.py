@@ -2,11 +2,11 @@ import json, os
 import argparse
 
 from core.validator import ControllerValidator
+from core.buff_optimizer import Optimizer
 from core.command import Command, command_factory, DEFAULT_VALUE
 from core.command_buffer import CommandBuffer
 
 MAX_ERASE_SIZE = 10
-
 ERROR = 'ERROR'
 PROJECT_ROOT = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 SSD_NAND_PATH = os.path.join(PROJECT_ROOT, 'ssd_nand.txt')
@@ -16,6 +16,7 @@ SSD_OUTPUT_PATH = os.path.join(PROJECT_ROOT, 'ssd_output.txt')
 class SSDController:
     def __init__(self):
         self.validator = ControllerValidator()
+        self.optimizer = Optimizer()
         self.buffer = CommandBuffer()
         self.init_cache(self.buffer.get())
 
@@ -90,68 +91,11 @@ class SSDController:
             return False
 
     def buffer_optimize(self):
-        generated_commands = self._generate_commands()
-        picked_cmd = self._pick_smaller_commands(generated_commands, self.buffer.get())
+        generated_commands = self.optimizer.generate_new_commands(self.cache)
+        picked_cmd = self.optimizer.pick_smaller_commands(generated_commands, self.buffer.get())
         self.buffer.replace(picked_cmd)
 
-    def _pick_smaller_commands(self, generated_commands: list[Command], _buf_cmds: list[Command]) -> list[Command]:
-        if len(generated_commands) < len(_buf_cmds):
-            return generated_commands
-        return _buf_cmds
 
-    def _generate_commands(self) -> list[Command]:
-        new_commands = []
-        command = None
-        sorted_items = sorted(self.cache.items())
-        for addr, val in sorted_items:
-            if val == DEFAULT_VALUE:
-                if not command :
-                    command = command_factory('E', addr, 1)
-                elif command.mode == 'E' and addr == command.lba + command.size:
-                    command.size += 1
-                    if command.size >= MAX_ERASE_SIZE:
-                        new_commands.append(command)
-                        command = None
-                elif command.size or addr != command.lba + command.size:
-                    new_commands.append(command)
-                    command = command_factory('E', addr, 1)
-            else:
-                if command :
-                    new_commands.append(command)
-                command = command_factory('W', addr, val)
-        if command:
-            new_commands.append(command)
-        return new_commands
-
-    # upgraded
-    # def _generate_commands(self) -> list[Command]:
-    #     optimized_cmd = []
-    #     is_erase_duration = False
-    #     s_addr = -1
-    #     erase_length = -1
-    #     print('cache',self.cache)
-    #     for addr, val in self.cache.items():
-    #         if not val:
-    #             if is_erase_duration:
-    #                 is_erase_duration = False
-    #                 optimized_cmd.append(command_factory('E', s_addr, erase_length))
-    #             continue
-    #
-    #         if val != DEFAULT_VALUE:
-    #             if is_erase_duration:
-    #                 is_erase_duration = False
-    #                 optimized_cmd.append(command_factory('E', s_addr, erase_length))
-    #             optimized_cmd.append(command_factory('W', addr, val))
-    #
-    #         else:
-    #             if is_erase_duration:
-    #                 erase_length += 1
-    #             else:
-    #                 is_erase_duration = True
-    #                 s_addr = addr
-    #                 erase_length = 1
-    #     print('opt',optimized_cmd)
-    #     return optimized_cmd
 
     def update_nand_txt(self, addr, val, size=1) -> None:
         if not os.path.exists(SSD_NAND_PATH):
