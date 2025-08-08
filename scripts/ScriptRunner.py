@@ -23,7 +23,7 @@ class ScriptRunner:
         if '_' not in cmd:
             return False
         idx, script_name = cmd.split('_', 1)
-        return idx in self.script_mapping and script_name == self.script_mapping[idx].__name__
+        return idx in self.script_mapping and (script_name == self.script_mapping[idx].__name__ or script_name == '')
 
     def run(self, command: str):
         if ".txt" in command:
@@ -37,11 +37,7 @@ class ScriptRunner:
         script_class = self.script_mapping.get(command.split('_')[0])
         script = script_class()
 
-        if script.run():
-            print("PASS")
-        else:
-            print("FAIL")
-        return
+        print("PASS" if script.run() else "FAIL")
 
     def run_script_file(self, script_filename):
         try:
@@ -60,11 +56,8 @@ class ScriptRunner:
                     script_class = self.script_mapping.get(command.split('_')[0])
                     script = script_class()
 
-                    if script.run():
-                        print("Pass")
-                    else:
-                        print("FAIL!")
-                        return
+                    print("PASS" if script.run() else "FAIL!")
+
 
         except FileNotFoundError:
             print(f"[Error] Script file not found in upper directory: {script_filename}")
