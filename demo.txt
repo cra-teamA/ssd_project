@@ -1,0 +1,40 @@
+# 1. SSD Controller Demo
+./ssd W 20 0x0123abcd
+./ssd R 20
+cat ./ssd_output.txt
+./ssd E 11 20
+./ssd R 20
+cat ./ssd_output.txt
+ls ./buffer
+./ssd F
+ls ./buffer
+
+# 2. SSD Buffer Optimize Demo
+./ssd W 20 0x0123abcd
+./ssd R 20
+cat ./ssd_output.txt
+./ssd E 11 20
+./ssd R 20
+cat ./ssd_output.txt
+ls ./buffer
+./ssd F
+ls ./buffer
+
+# 3. Script Demo
+./shell.bat
+help
+write 20 0x0123abcd
+read 20
+fullwrite 0x0123abcd
+fullread
+erase_range 50 100
+erase_range 50 99
+fullread
+1_
+flush
+exit
+
+# 4. Script Runner Demo
+cat ./shell_scripts.txt
+./shell.bat shell_scripts.txt
+
